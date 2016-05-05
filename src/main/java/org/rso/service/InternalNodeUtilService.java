@@ -9,7 +9,10 @@ import org.rso.utils.NodeInfo;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Log
@@ -27,6 +30,46 @@ public class InternalNodeUtilService {
     *               */
     public void doElection(){
         log.info("przeprowadzamy procedure elekcji ");
+        AppProperty appProperty = AppProperty.getInstance();
+        int selfNodeId = appProperty.getSelfNode().getNodeId();
+        List<String> listOfIpAddresses = getAviableIPAddresses(appProperty, selfNodeId);
+        if(listOfIpAddresses.isEmpty()){
+//            koniec elekcji jestem nowym koorynatorem
+            comunicateAsNewCoordinator();
+        }else {
+//            proces elekcji dla innych wezlow
+            RestTemplate restTemplate = new RestTemplate();
+            for(String ip: listOfIpAddresses){
+                StringBuilder builder = new StringBuilder("http://");
+                builder.append(ip);
+                builder.append(":8080/utils/election");
+                try {
+                    NodeInfo info = restTemplate.postForObject(builder.toString(),appProperty.getSelfNode(),NodeInfo.class);
+                    log.info("info "+ info);
+                    if(info.getNodeId()>selfNodeId){
+                        return;
+                    }
+                }catch (Exception e){
+                    log.info("wyjatek przy robieniu elekcji nie znaleziono hosta ");
+                }
+
+            }
+        }
+    }
+
+    /*
+    * powiadom wszytskich ze jestes nowym koordynatorem
+    * to automatycznie usuwa koordynatorow jako dostepne serwery z listy AppProperty
+    * Rozpocznij proces replikacji danych ktore byly dostepne na koordynatorze - chyba najtrudniejsze jak narazie*/
+    private void comunicateAsNewCoordinator() {
+
+    }
+
+    private ArrayList<String> getAviableIPAddresses(AppProperty appProperty, int selfNodeId) {
+        return appProperty.getListOfAvaiableNodes().stream()
+                                        .filter(p -> p.getNodeId() > selfNodeId).
+                                        map(n -> n.getNodeIPAddress()).
+                                        collect(Collectors.toCollection(ArrayList::new));
     }
 
     public void doHeartBeat() {

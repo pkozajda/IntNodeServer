@@ -31,6 +31,7 @@ public class UtilController {
 
     @RequestMapping(value = "/election",method = RequestMethod.POST)
     public NodeInfo electionAction(@RequestBody NodeInfo node){
+        log.info("przeslano rzadanie elekcji od wezla " + node.toString());
         AppProperty appProperty = AppProperty.getInstance();
         NodeInfo selfNode = appProperty.getSelfNode();
         int selfNodeId = selfNode.getNodeId();
