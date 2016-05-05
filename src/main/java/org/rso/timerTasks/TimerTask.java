@@ -20,11 +20,22 @@ public class TimerTask {
     @Autowired
     private InternalNodeUtilService utilService;
 
+//    wykonuje koordator
     @Scheduled(fixedRate = PERIOD_OF_TIME)
     public void doHeartBeat(){
         NodeType selfType = AppProperty.getInstance().getSelfNode().getNodeType();
         if(selfType==NodeType.INTERNAL_COORDINATOR){
             utilService.doHeartBeat();
+        }
+    }
+
+//    wykonuje zwykly wezel
+    @Scheduled(fixedRate = PERIOD_OF_TIME)
+//    TODO co jaki czas sprawdza obecnosc koordynatora zwykly wezel
+    public void verifyCoordinatorPresence(){
+        NodeType selfType = AppProperty.getInstance().getSelfNode().getNodeType();
+        if(selfType==NodeType.INTERNAL){
+            utilService.verifyCoordinatorPresence();
         }
     }
 }

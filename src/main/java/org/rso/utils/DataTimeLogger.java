@@ -1,5 +1,7 @@
 package org.rso.utils;
 
+import lombok.Data;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -11,5 +13,9 @@ public class DataTimeLogger {
 
     public static String logTime(){
         return dateFormat.format(new Date());
+    }
+
+    public static String logTime(Date data){
+        return data!=null? dateFormat.format(data):"date is null";
     }
 }

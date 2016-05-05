@@ -1,8 +1,8 @@
 package org.rso.utils;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.java.Log;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 /**
  * Created by Radosław on 05.05.2016.
  */
+@Log
 public class AppProperty {
     private static AppProperty appProperty;
     private Date lastCoordinatorPresence;
@@ -22,7 +23,9 @@ public class AppProperty {
 
     private List<NodeInfo> listOfAvaiableNodes = new ArrayList<>();
 
-    private AppProperty(){}
+    private AppProperty(){
+        this.lastCoordinatorPresence = new Date();
+    }
 
     public synchronized static AppProperty getInstance() {
         if(appProperty==null){
@@ -32,6 +35,7 @@ public class AppProperty {
     }
 
     public synchronized void setLastCoordinatorPresence(Date lastCoordinatorPresence) {
+        log.info("aktualizujemy date obecnosci koordynatora "+DataTimeLogger.logTime(lastCoordinatorPresence));
         this.lastCoordinatorPresence = lastCoordinatorPresence;
     }
 
