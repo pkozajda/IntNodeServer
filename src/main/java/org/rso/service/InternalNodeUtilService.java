@@ -17,6 +17,14 @@ public class InternalNodeUtilService {
 
     private static final long TIME_TO_RUN_ELLECTION = 15000;
 
+    /*
+    * 1-pobrac wszystkie wezly o wiekszym identyfikatorze
+    * 2-nawiazac kontakt z kazdym
+    *       a - jezeli odpowie przerwij proces elekcji
+    *       b - jezeli nie odpowie jestes koordnatorem
+    *               -poinformuj wszystkie wezly o tym fakcjie
+    *               -zmien swoje glowne ustawienia
+    *               */
     public void doElection(){
         log.info("przeprowadzamy procedure elekcji ");
     }
@@ -46,11 +54,9 @@ public class InternalNodeUtilService {
         log.info("koordynator obecny byl ostatnio " + DataTimeLogger.logTime(lastPresence));
         long dif = DateComperator.compareDate(lastPresence,new Date());
         if(dif>TIME_TO_RUN_ELLECTION){
-            detectedCoordinatorApsence();
+            doElection();
         }
     }
 
-    private void detectedCoordinatorApsence() {
 
-    }
 }
