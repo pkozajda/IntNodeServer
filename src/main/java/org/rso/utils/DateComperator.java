@@ -2,9 +2,6 @@ package org.rso.utils;
 
 import java.util.Date;
 
-/**
- * Created by Radosław on 05.05.2016.
- */
 public class DateComperator {
 
     public static long compareDate(Date a, Date b){

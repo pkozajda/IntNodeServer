@@ -5,9 +5,6 @@ import org.rso.utils.DataTimeLogger;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Created by Radosław on 04.05.2016.
- */
 @RestController
 @RequestMapping("example")
 @Log

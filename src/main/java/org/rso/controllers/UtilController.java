@@ -12,9 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 
-/**
- * Created by Radosław on 05.05.2016.
- */
 @RestController
 @RequestMapping("utils")
 @Log

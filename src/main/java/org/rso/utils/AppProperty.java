@@ -9,9 +9,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Created by Radosław on 05.05.2016.
- */
 @Log
 public class AppProperty {
     private static AppProperty appProperty;

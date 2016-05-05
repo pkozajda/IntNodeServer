@@ -8,9 +8,6 @@ import org.rso.utils.DateComperator;
 
 import java.util.Date;
 
-/**
- * Created by Radosław on 05.05.2016.
- */
 public class DateComperatorTest {
 
     @Ignore
