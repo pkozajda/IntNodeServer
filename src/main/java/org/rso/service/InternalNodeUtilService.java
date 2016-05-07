@@ -153,10 +153,8 @@ public class InternalNodeUtilService {
 
         appProperty.removeUnAvaiableNode(currentSelfNode.getNodeId());
 
-        appProperty.addAvaiableNode(newCoordinatorNode);
         appProperty.setCoordinatorNode(newCoordinatorNode);
         appProperty.setSelfNode(newCoordinatorNode);
-
 
         log.info(String.format("%s: I am the new coordinator! %s", coordinatorTag, appProperty.getSelfNode()));
 

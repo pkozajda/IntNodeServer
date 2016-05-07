@@ -93,12 +93,7 @@ public class UtilController {
 
         appProperty.removeUnAvaiableNode(coordinator.getNodeId());
 
-        appProperty.addAvaiableNode(newCoordinatorNode);
         appProperty.setCoordinatorNode(newCoordinatorNode);
-
-//        if(appProperty.getSelfNode().getNodeId() == newCoordinatorNode.getNodeId()) {
-//            appProperty.setSelfNode(newCoordinatorNode);
-//        }
 
         return ResponseEntity.noContent().build();
     }
