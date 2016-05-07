@@ -30,7 +30,7 @@ public class TimerTask {
     }
 
     /* Coordinator presence verification task - executed by each internal node */
-    @Scheduled(fixedRateString = "${delay.coordinator.check}")
+    //@Scheduled(fixedRateString = "${delay.coordinator.check}")
     public void coordinatorPresenceVerificationTask() {
         final NodeType selfType = appProperty.getSelfNode().getNodeType();
 
