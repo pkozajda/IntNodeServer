@@ -118,5 +118,5 @@ public class NodesCfgServiceImpl implements NodesCfgService {
         return propertyKey + "." + i + "." + propertyValue;
     }
 
-    private Predicate<NodeInfo> internalNode = nodeInfo -> nodeInfo.getNodeType().equals(NodeType.INTERNAL_COORDINATOR);
+    private Predicate<NodeInfo> internalNode = nodeInfo -> nodeInfo.getNodeType().equals(NodeType.INTERNAL);
 }
