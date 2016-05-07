@@ -1,5 +1,6 @@
 package org.rso.service;
 
+import javaslang.control.Try;
 import lombok.NoArgsConstructor;
 import lombok.extern.java.Log;
 import org.rso.dto.NodeStatusDto;
@@ -7,6 +8,7 @@ import org.rso.utils.AppProperty;
 import org.rso.utils.DataTimeLogger;
 import org.rso.utils.DateComperator;
 import org.rso.utils.NodeInfo;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -15,14 +17,23 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
 @Log
+@Service
 public class InternalNodeUtilService {
 
-    private static final long TIME_TO_RUN_ELLECTION = 15000;
     private static final String DEFAULT_NODES_PORT = "8080";
 
+    @Value("${delay.election}")
+    private long electionDelay;
+
+    @Value("${log.tag.coordinator}")
+    private String coordinatorTag;
+
+
     private static final String HEARTBEAT_URL = "http://{ip}:{port}/utils/heartbeat";
+
+    private final AppProperty appProperty = AppProperty.getInstance();
+
 
     /*
     * 1-pobrac wszystkie wezly o wiekszym identyfikatorze
@@ -78,40 +89,32 @@ public class InternalNodeUtilService {
 
     public void doHeartBeat() {
 //        TODO nie ma obslugi bledow + zastanowic sie nad mniejszym timeoutem
-        log.info("przeprowadzamy procedure bicia serca ");
+        log.info(String.format("%s: Running heartbeat checks", coordinatorTag));
         RestTemplate restTemplate = new RestTemplate();
-        AppProperty appProperty = AppProperty.getInstance();
-        NodeInfo actualNode;
 
-
-        /* TODO:
-            Refactor to Java 8
-            Parallel calls to nodes
+        /*
+            TODO: Parallel calls to nodes
          */
-        for(String ip:appProperty.getAvaiableNodesIpAddresses()){
-//            StringBuilder builder = new StringBuilder("http://");
-//            builder.append(ip);
-//            builder.append(":8080/utils/heartbeat");
-            try {
+        appProperty.getAvaiableNodesIpAddresses().forEach(nodeIpAddress -> {
+            Try.run(() -> {
                 final NodeStatusDto internalNodeStatusDto = restTemplate.getForObject(
                         HEARTBEAT_URL,
                         NodeStatusDto.class,
-                        ip,
+                        nodeIpAddress,
                         DEFAULT_NODES_PORT
                 );
                 log.info("bicie serca odebral obiekt " + internalNodeStatusDto);
-            }catch (Exception e){
-                log.info("dupa");
-//                TODO nie ma wezla wiec trzeba go usunac z listy wezlow rozeslac ze go nie ma i zreplikowac dane
-            }
-        }
+            }).onFailure(e -> log.info(String.format("Node %s stoped responding", nodeIpAddress)));
+//            TODO nie ma wezla wiec trzeba go usunac z listy wezlow rozeslac ze go nie ma i zreplikowac dane
+        });
     }
 
     public void verifyCoordinatorPresence() {
         Date lastPresence = AppProperty.getInstance().getLastCoordinatorPresence();
         log.info("koordynator obecny byl ostatnio " + DataTimeLogger.logTime(lastPresence));
         long dif = DateComperator.compareDate(lastPresence,new Date());
-        if(dif>TIME_TO_RUN_ELLECTION){
+
+        if(dif > electionDelay){
             doElection();
         }
     }
