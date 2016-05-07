@@ -2,6 +2,7 @@ package org.rso.service;
 
 import lombok.NoArgsConstructor;
 import lombok.extern.java.Log;
+import org.rso.dto.NodeStatusDto;
 import org.rso.utils.AppProperty;
 import org.rso.utils.DataTimeLogger;
 import org.rso.utils.DateComperator;
@@ -19,6 +20,9 @@ import java.util.stream.Collectors;
 public class InternalNodeUtilService {
 
     private static final long TIME_TO_RUN_ELLECTION = 15000;
+    private static final String DEFAULT_NODES_PORT = "8080";
+
+    private static final String HEARTBEAT_URL = "http://{ip}:{port}/utils/heartbeat";
 
     /*
     * 1-pobrac wszystkie wezly o wiekszym identyfikatorze
@@ -78,13 +82,24 @@ public class InternalNodeUtilService {
         RestTemplate restTemplate = new RestTemplate();
         AppProperty appProperty = AppProperty.getInstance();
         NodeInfo actualNode;
+
+
+        /* TODO:
+            Refactor to Java 8
+            Parallel calls to nodes
+         */
         for(String ip:appProperty.getAvaiableNodesIpAddresses()){
-            StringBuilder builder = new StringBuilder("http://");
-            builder.append(ip);
-            builder.append(":8080/utils/heartbeat");
+//            StringBuilder builder = new StringBuilder("http://");
+//            builder.append(ip);
+//            builder.append(":8080/utils/heartbeat");
             try {
-                actualNode = restTemplate.getForObject(builder.toString(), NodeInfo.class);
-                log.info("bicie serca odebral obiekt "+actualNode);
+                final NodeStatusDto internalNodeStatusDto = restTemplate.getForObject(
+                        HEARTBEAT_URL,
+                        NodeStatusDto.class,
+                        ip,
+                        DEFAULT_NODES_PORT
+                );
+                log.info("bicie serca odebral obiekt " + internalNodeStatusDto);
             }catch (Exception e){
                 log.info("dupa");
 //                TODO nie ma wezla wiec trzeba go usunac z listy wezlow rozeslac ze go nie ma i zreplikowac dane
