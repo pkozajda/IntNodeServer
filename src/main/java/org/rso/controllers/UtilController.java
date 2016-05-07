@@ -6,8 +6,11 @@ import org.rso.dto.NodeStatusDto;
 import org.rso.service.InternalNodeUtilService;
 import org.rso.utils.AppProperty;
 import org.rso.utils.NodeInfo;
+import org.rso.utils.NodeType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,7 +48,7 @@ public class UtilController {
 
         appProperty.setLastCoordinatorPresence(new Date());
 
-        return DtoConverters.nodeIntoToNodeStatusDto.apply(appProperty.getSelfNode());
+        return DtoConverters.nodeInfoToNodeStatusDto.apply(appProperty.getSelfNode());
     }
 
     @RequestMapping(value = "/election", method = RequestMethod.POST)
@@ -60,6 +63,43 @@ public class UtilController {
             utilService.doElection();
         }
 
-        return DtoConverters.nodeIntoToNodeStatusDto.apply(selfNode);
+        return DtoConverters.nodeInfoToNodeStatusDto.apply(selfNode);
+    }
+
+    @RequestMapping(value = "/coordinator", method = RequestMethod.GET)
+    public NodeStatusDto getCurrentCoordinator() {
+        return DtoConverters.nodeInfoToNodeStatusDto.apply(appProperty.getCoordinatorNode());
+    }
+
+    @RequestMapping(value = "/coordinator", method = RequestMethod.PUT)
+    public ResponseEntity<Void> setNewCoordinator(@RequestBody final NodeStatusDto coordinator) {
+
+        /* TODO: safety checks of input coordinator DTO */
+
+        if(coordinator.getNodeId() == appProperty.getCoordinatorNode().getNodeId()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+
+        final NodeInfo coordinatorNode = appProperty.getNodeById(coordinator.getNodeId());
+
+
+        final NodeInfo newCoordinatorNode = NodeInfo.builder()
+                .nodeId(coordinator.getNodeId())
+                .nodeIPAddress(coordinator.getNodeIPAddress())
+                .nodeType(NodeType.INTERNAL_COORDINATOR)
+                .build();
+
+        log.info(String.format("%s: Setting new coordinator: %s", electionTag, newCoordinatorNode));
+
+        appProperty.removeUnAvaiableNode(coordinator.getNodeId());
+
+        appProperty.addAvaiableNode(newCoordinatorNode);
+        appProperty.setCoordinatorNode(newCoordinatorNode);
+
+//        if(appProperty.getSelfNode().getNodeId() == newCoordinatorNode.getNodeId()) {
+//            appProperty.setSelfNode(newCoordinatorNode);
+//        }
+
+        return ResponseEntity.noContent().build();
     }
 }

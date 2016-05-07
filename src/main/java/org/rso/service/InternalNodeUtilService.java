@@ -2,12 +2,14 @@ package org.rso.service;
 
 import javaslang.control.Try;
 import lombok.extern.java.Log;
+import org.rso.dto.DtoConverters;
 import org.rso.dto.NodeStatusDto;
-import org.rso.utils.AppProperty;
-import org.rso.utils.DataTimeLogger;
-import org.rso.utils.DateComperator;
-import org.rso.utils.NodeInfo;
+import org.rso.utils.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -43,6 +45,7 @@ public class InternalNodeUtilService {
     private static final String DEFAULT_NODES_PORT = "8080";
     private static final String HEARTBEAT_URL = "http://{ip}:{port}/utils/heartbeat";
     private static final String ELECTION_URL = "http://{ip}:{port}/utils/election";
+    private static final String COORDINATOR_URL = "http://{ip}:{port}/utils/coordinator";
 
     /* TODO: remove singleton */
     private final AppProperty appProperty = AppProperty.getInstance();
@@ -90,7 +93,7 @@ public class InternalNodeUtilService {
         log.info(String.format("%s: Running election procedure", electionTag));
 
         final int selfNodeId = appProperty.getSelfNode().getNodeId();
-        final List<String> listOfIpAddresses = getAviableIPAddresses(appProperty, selfNodeId);
+        final List<String> listOfIpAddresses = getAvailableIPAddresses(appProperty.getAvailableNodes(), selfNodeId);
 
         if(listOfIpAddresses.isEmpty()) {
 //            koniec elekcji jestem nowym koorynatorem
@@ -140,12 +143,49 @@ public class InternalNodeUtilService {
     * Rozpocznij proces replikacji danych ktore byly dostepne na koordynatorze - chyba najtrudniejsze jak narazie*/
     private void comunicateAsNewCoordinator() {
 
+        final NodeInfo currentSelfNode = appProperty.getSelfNode();
+
+        final NodeInfo newCoordinatorNode = NodeInfo.builder()
+                .nodeId(currentSelfNode.getNodeId())
+                .nodeIPAddress(currentSelfNode.getNodeIPAddress())
+                .nodeType(NodeType.INTERNAL_COORDINATOR)
+                .build();
+
+        appProperty.removeUnAvaiableNode(currentSelfNode.getNodeId());
+
+        appProperty.addAvaiableNode(newCoordinatorNode);
+        appProperty.setCoordinatorNode(newCoordinatorNode);
+        appProperty.setSelfNode(newCoordinatorNode);
+
+
+        log.info(String.format("%s: I am the new coordinator! %s", coordinatorTag, appProperty.getSelfNode()));
+
+        final HttpEntity<NodeStatusDto> selfNodeStatusDtoHttpEntity =
+                new HttpEntity<>(DtoConverters.nodeInfoToNodeStatusDto.apply(appProperty.getSelfNode()));
+
+        /* TODO: parallel calls to nodes */
+        appProperty.getAvaiableNodesIpAddresses().forEach(nodeIpAddress -> {
+            Try.run(() -> {
+                final ResponseEntity<Void> newCoordinatorResponseEntity = restTemplate.exchange(
+                        COORDINATOR_URL,
+                        HttpMethod.PUT,
+                        selfNodeStatusDtoHttpEntity,
+                        Void.class,
+                        nodeIpAddress,
+                        DEFAULT_NODES_PORT
+                );
+
+                log.info(String.format("%s %s: Elected coordinator update returned status: %s", coordinatorTag, electionTag, newCoordinatorResponseEntity.getStatusCode()));
+            }).onFailure(e -> log.info(String.format("%s %s: Node %s stopped responding? %s", coordinatorTag, heartbeatTag, nodeIpAddress, e.getMessage())));
+        });
+
+        log.info(String.format("%s %s: Election process completed!", coordinatorTag, electionTag));
     }
 
-    private List<String> getAviableIPAddresses(AppProperty appProperty, int selfNodeId) {
-        return appProperty.getListOfAvaiableNodes().stream()
-                .filter(p -> p.getNodeId() > selfNodeId).
-                        map(n -> n.getNodeIPAddress()).
-                        collect(toList());
+    private List<String> getAvailableIPAddresses(final List<NodeInfo> availableNodes, final int selfNodeId) {
+        return availableNodes.stream()
+                .filter(node -> node.getNodeId() > selfNodeId)
+                .map(NodeInfo::getNodeIPAddress)
+                .collect(toList());
     }
 }

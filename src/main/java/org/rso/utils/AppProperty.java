@@ -3,6 +3,7 @@ package org.rso.utils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.java.Log;
+import org.rso.exceptions.NodeNotFoundException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,7 +41,7 @@ public class AppProperty {
         return lastCoordinatorPresence;
     }
 
-    public synchronized List<NodeInfo> getListOfAvaiableNodes() {
+    public synchronized List<NodeInfo> getAvailableNodes() {
         return listOfAvaiableNodes;
     }
 
@@ -61,5 +62,14 @@ public class AppProperty {
     public List<String> getAvaiableNodesIpAddresses(){
         return this.listOfAvaiableNodes.stream().map(p->p.getNodeIPAddress()).collect(Collectors.toCollection(ArrayList::new));
     }
+
+
+    public NodeInfo getNodeById(final int nodeId) throws NodeNotFoundException {
+        return getAvailableNodes().stream()
+                .filter(node -> node.getNodeId() == nodeId)
+                .findFirst()
+                .orElseThrow(() -> new NodeNotFoundException(String.format("Node with id = %s does not exist", nodeId)));
+    }
+
 }
 
