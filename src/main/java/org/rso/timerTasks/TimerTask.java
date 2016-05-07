@@ -24,7 +24,7 @@ public class TimerTask {
     public void heartbeatTask() {
         final NodeType selfType = appProperty.getSelfNode().getNodeType();
 
-        if(selfType == NodeType.INTERNAL_COORDINATOR){
+        if(selfType == NodeType.INTERNAL_COORDINATOR) {
             utilService.doHeartBeat();
         }
     }

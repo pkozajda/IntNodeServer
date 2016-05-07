@@ -7,6 +7,7 @@ import org.rso.service.InternalNodeUtilService;
 import org.rso.utils.AppProperty;
 import org.rso.utils.NodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,30 +21,37 @@ import java.util.Date;
 @RequestMapping("utils")
 public class UtilController {
 
+    /* TODO:
+            1. Integrity checks to ensure we got a heartbeat from current coordinator
+            2. Yoda time
+            3. Remove ugly singleton
+    */
+
     @Autowired
     private InternalNodeUtilService utilService;
 
-    /* TODO: remove singleton */
+    @Value("${log.tag.election}")
+    private String electionTag;
+
+    @Value("${log.tag.heartbeat}")
+    private String heartbeatTag;
+
     private final AppProperty appProperty = AppProperty.getInstance();
 
     @RequestMapping(value = "/heartbeat")
     public NodeStatusDto heartbeatProtocol(final HttpServletRequest httpServletRequest){
-        log.info("Received heartbeat signal from: " + httpServletRequest.getRemoteAddr());
 
-        /* TODO:
-            1. Integrity checks to ensure we got a heartbeat from current coordinator
-            2. Yoda time
-            3. Remove ugly singleton
-         */
+        log.info(String.format("%s: Received heartbeat request from: %s", heartbeatTag, httpServletRequest.getRemoteAddr()));
 
         appProperty.setLastCoordinatorPresence(new Date());
 
         return DtoConverters.nodeIntoToNodeStatusDto.apply(appProperty.getSelfNode());
     }
 
-    @RequestMapping(value = "/election",method = RequestMethod.POST)
+    @RequestMapping(value = "/election", method = RequestMethod.POST)
     public NodeStatusDto electionAction(@RequestBody final NodeStatusDto node) {
-        log.info("Received election request from: " + node.toString());
+
+        log.info(String.format("%s: Received election request from: %s", electionTag, node.toString()));
 
         final NodeInfo selfNode = appProperty.getSelfNode();
         final int selfNodeId = selfNode.getNodeId();

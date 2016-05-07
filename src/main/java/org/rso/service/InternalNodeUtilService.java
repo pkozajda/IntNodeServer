@@ -6,6 +6,7 @@ import org.rso.dto.NodeStatusDto;
 import org.rso.utils.AppProperty;
 import org.rso.utils.DataTimeLogger;
 import org.rso.utils.DateComperator;
+import org.rso.utils.NodeInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -27,6 +28,12 @@ public class InternalNodeUtilService {
     @Value("${log.tag.coordinator}")
     private String coordinatorTag;
 
+    @Value("${log.tag.election}")
+    private String electionTag;
+
+    @Value("${log.tag.heartbeat}")
+    private String heartbeatTag;
+
     private static final String HEARTBEAT_URL = "http://{ip}:{port}/utils/heartbeat";
     private static final String ELECTION_URL = "http://{ip}:{port}/utils/election";
 
@@ -38,7 +45,7 @@ public class InternalNodeUtilService {
     public void doHeartBeat() {
 //        TODO nie ma obslugi bledow + zastanowic sie nad mniejszym timeoutem
 
-        log.info(String.format("%s: Running heartbeat checks", coordinatorTag));
+        log.info(String.format("%s %s: Running heartbeat checks", coordinatorTag, heartbeatTag));
 
         /*
             TODO: Parallel calls to nodes
@@ -51,7 +58,7 @@ public class InternalNodeUtilService {
                         nodeIpAddress,
                         DEFAULT_NODES_PORT
                 );
-                log.info(String.format("%s: Heartbeat check of %s received: %s", coordinatorTag, nodeIpAddress, internalNodeStatusDto));
+                log.info(String.format("%s %s: Heartbeat check of %s received: %s", coordinatorTag, heartbeatTag, nodeIpAddress, internalNodeStatusDto));
             }).onFailure(e -> log.info(String.format("Node %s stopped responding", nodeIpAddress)));
 //            TODO nie ma wezla wiec trzeba go usunac z listy wezlow rozeslac ze go nie ma i zreplikowac dane
         });
@@ -66,7 +73,7 @@ public class InternalNodeUtilService {
     *               -zmien swoje glowne ustawienia
     *               */
     public void doElection(){
-        log.info("Running election procedure");
+        log.info(String.format("%s: Running election procedure", electionTag));
 
         final int selfNodeId = appProperty.getSelfNode().getNodeId();
         final List<String> listOfIpAddresses = getAviableIPAddresses(appProperty, selfNodeId);
@@ -93,7 +100,7 @@ public class InternalNodeUtilService {
                         return;
                     }
                 }catch (Exception e){
-                    log.info(String.format("Exception during election procedure - host %s not found", ip));
+                    log.info(String.format("%s: Exception during election procedure - host %s not found", electionTag, ip));
                 }
 
             }
@@ -102,7 +109,10 @@ public class InternalNodeUtilService {
 
     public void verifyCoordinatorPresence() {
         Date lastPresence = appProperty.getLastCoordinatorPresence();
-        log.info("koordynator obecny byl ostatnio " + DataTimeLogger.logTime(lastPresence));
+        final NodeInfo currentCoordinator = appProperty.getCoordinatorNode();
+//        log.info("koordynator obecny byl ostatnio " + DataTimeLogger.logTime(lastPresence));
+        log.info(String.format("Coordinator (id = %s, IP = %s) last seen: %s",
+                currentCoordinator.getNodeId(), currentCoordinator.getNodeIPAddress(), DataTimeLogger.logTime(lastPresence)));
         long dif = DateComperator.compareDate(lastPresence,new Date());
 
         if(dif > electionDelay){
