@@ -23,6 +23,9 @@ public class UtilController {
     @Autowired
     private InternalNodeUtilService utilService;
 
+    /* TODO: remove singleton */
+    private final AppProperty appProperty = AppProperty.getInstance();
+
     @RequestMapping(value = "/heartbeat")
     public NodeStatusDto heartbeatProtocol(final HttpServletRequest httpServletRequest){
         log.info("Received heartbeat signal from: " + httpServletRequest.getRemoteAddr());
@@ -33,22 +36,22 @@ public class UtilController {
             3. Remove ugly singleton
          */
 
-        AppProperty appProperty = AppProperty.getInstance();
         appProperty.setLastCoordinatorPresence(new Date());
 
         return DtoConverters.nodeIntoToNodeStatusDto.apply(appProperty.getSelfNode());
     }
 
     @RequestMapping(value = "/election",method = RequestMethod.POST)
-    public NodeInfo electionAction(@RequestBody NodeInfo node){
-        log.info("przeslano rzadanie elekcji od wezla " + node.toString());
-        AppProperty appProperty = AppProperty.getInstance();
-        NodeInfo selfNode = appProperty.getSelfNode();
-        int selfNodeId = selfNode.getNodeId();
-        if(selfNodeId>node.getNodeId()){
+    public NodeStatusDto electionAction(@RequestBody final NodeStatusDto node) {
+        log.info("Received election request from: " + node.toString());
+
+        final NodeInfo selfNode = appProperty.getSelfNode();
+        final int selfNodeId = selfNode.getNodeId();
+
+        if(selfNodeId > node.getNodeId()) {
             utilService.doElection();
         }
-        return selfNode;
-    }
 
+        return DtoConverters.nodeIntoToNodeStatusDto.apply(selfNode);
+    }
 }
