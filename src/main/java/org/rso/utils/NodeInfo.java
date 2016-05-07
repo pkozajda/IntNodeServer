@@ -1,14 +1,18 @@
 package org.rso.utils;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
+@Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@EqualsAndHashCode
 public class NodeInfo {
-    private int nodeId;
-    private String nodeIPAddress;
-    private NodeType nodeType;
+
+    public static final String NODE_ID = "id";
+    public static final String NODE_ADDRESS = "ip";
+    public static final String NODE_TYPE = "type";
+
+    private final int nodeId;
+    private final String nodeIPAddress;
+    private final NodeType nodeType;
 }
