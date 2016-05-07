@@ -8,8 +8,6 @@ import org.rso.utils.DataTimeLogger;
 import org.rso.utils.DateComperator;
 import org.rso.utils.NodeInfo;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -150,12 +148,4 @@ public class InternalNodeUtilService {
                         map(n -> n.getNodeIPAddress()).
                         collect(toList());
     }
-
-    private ClientHttpRequestFactory clientHttpRequestFactoryWithTimeout() {
-        final HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setReadTimeout(2000);
-        factory.setConnectTimeout(2000);
-        return factory;
-    }
-
 }
