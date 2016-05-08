@@ -21,8 +21,8 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 @Log
-@Service
-public class InternalNodeUtilService {
+@Service("internalNodeUtilService")
+public class InternalNodeUtilService implements NodeUtilService {
 
     @Value("${delay.election}")
     private long electionDelay;
@@ -59,25 +59,38 @@ public class InternalNodeUtilService {
     }
 
     public void doHeartBeat() {
-//        TODO nie ma obslugi bledow + zastanowic sie nad mniejszym timeoutem
 
-        log.info(String.format("%s %s: Running heartbeat checks", coordinatorTag, heartbeatTag));
+        if(appProperty.getAvailableNodes().isEmpty()) {
+            return;
+        }
 
+        log.info(String.format("%s %s: Running heartbeat checks (%s nodes)", coordinatorTag, heartbeatTag, appProperty.getAvailableNodes().size()));
 
         /*
             TODO: Parallel calls to nodes
          */
-        appProperty.getAvaiableNodesIpAddresses().forEach(nodeIpAddress -> {
+        appProperty.getAvailableNodes().forEach(nodeInfo -> {
             Try.run(() -> {
                 final NodeStatusDto internalNodeStatusDto = restTemplate.getForObject(
                         HEARTBEAT_URL,
                         NodeStatusDto.class,
-                        nodeIpAddress,
+                        nodeInfo.getNodeIPAddress(),
                         DEFAULT_NODES_PORT
                 );
-                log.info(String.format("%s %s: Heartbeat check of %s received: %s", coordinatorTag, heartbeatTag, nodeIpAddress, internalNodeStatusDto));
-            }).onFailure(e -> log.info(String.format("%s %s: Node %s stopped responding", coordinatorTag, heartbeatTag, nodeIpAddress)));
-//            TODO nie ma wezla wiec trzeba go usunac z listy wezlow rozeslac ze go nie ma i zreplikowac dane
+                log.info(String.format("%s %s: Heartbeat check of %s received: %s", coordinatorTag, heartbeatTag, nodeInfo.getNodeIPAddress(), internalNodeStatusDto));
+            }).onFailure(e -> {
+
+                log.info(String.format("%s %s: Node %s stopped responding", coordinatorTag, heartbeatTag, nodeInfo.getNodeIPAddress()));
+                /* TODO: Numer of retries before node is removed ??? */
+
+                // TODO nie ma wezla wiec trzeba go:
+                // 1. usunac z listy wezlow (+)
+                // 2. rozeslac ze go nie ma
+                // 3. zreplikowac dane
+                appProperty.removeUnAvaiableNode(nodeInfo.getNodeId());
+
+            });
+
         });
     }
 
@@ -124,6 +137,7 @@ public class InternalNodeUtilService {
         }
     }
 
+    /* TODO: Refactor using Yoda Time */
     public void verifyCoordinatorPresence() {
         Date lastPresence = appProperty.getLastCoordinatorPresence();
         final NodeInfo currentCoordinator = appProperty.getCoordinatorNode();
