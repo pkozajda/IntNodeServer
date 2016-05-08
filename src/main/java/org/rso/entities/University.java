@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.rso.utils.Location;
+import org.rso.utils.UniversityType;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -22,12 +23,14 @@ public class University implements Serializable{
     private String name;
     private String yearOfFundation;
     private Location location;
+    private UniversityType universityType;
     @OneToMany(cascade = CascadeType.ALL)
     private List<Department> departments = new ArrayList<>();
 
-    public University(String name, String yearOfFundation, Location location){
+    public University(String name, String yearOfFundation, Location location,UniversityType universityType){
         this.name = name;
         this.yearOfFundation = yearOfFundation;
         this.location = location;
+        this.universityType = universityType;
     }
 }
