@@ -22,7 +22,12 @@ public class University implements Serializable{
     private String name;
     private String yearOfFundation;
     private Location location;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Department> departments = new ArrayList<>();
 
+    public University(String name, String yearOfFundation, Location location){
+        this.name = name;
+        this.yearOfFundation = yearOfFundation;
+        this.location = location;
+    }
 }
