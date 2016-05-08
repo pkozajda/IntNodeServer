@@ -11,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class Department {
+    private Long id;
     private String name;
 
     private List<FieldOfStudy> fieldOfStudies = new ArrayList<>();

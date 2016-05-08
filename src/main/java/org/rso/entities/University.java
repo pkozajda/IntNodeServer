@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class University {
+    private long id;
     private String name;
     private String yearOfFundation;
     private Location location;

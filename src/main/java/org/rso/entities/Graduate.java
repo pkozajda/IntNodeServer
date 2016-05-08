@@ -14,6 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class Graduate {
+    private long id;
     private String name;
     private String surname;
     private ComeFrom comeFrom;
