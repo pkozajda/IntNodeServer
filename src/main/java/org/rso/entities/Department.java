@@ -18,13 +18,11 @@ public class Department implements Serializable{
     @Column(name = "DEPARTMENT_ID")
     private Long id;
     private String name;
-
     @OneToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     private List<FieldOfStudy> fieldOfStudies = new ArrayList<>();
 
     public Department(String name){
         this.name = name;
     }
-
 
 }

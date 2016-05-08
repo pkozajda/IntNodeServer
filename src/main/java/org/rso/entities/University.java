@@ -22,8 +22,7 @@ public class University implements Serializable{
     private String name;
     private String yearOfFundation;
     private Location location;
-
-    @Transient
+    @OneToMany
     private List<Department> departments = new ArrayList<>();
 
 }
