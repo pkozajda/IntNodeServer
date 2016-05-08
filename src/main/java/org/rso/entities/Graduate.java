@@ -7,13 +7,14 @@ import org.rso.utils.ComeFrom;
 import org.rso.utils.Location;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-public class Graduate {
+public class Graduate implements Serializable{
     private long id;
     private String name;
     private String surname;
