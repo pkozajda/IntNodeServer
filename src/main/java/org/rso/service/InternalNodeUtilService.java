@@ -21,6 +21,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -55,6 +56,7 @@ public class InternalNodeUtilService implements NodeUtilService {
     private static final String COORDINATOR_URL = "http://{ip}:{port}/utils/coordinator";
     private static final String STATUS_URL = "http://{ip}:{port}/utils/status";
     private static final String NODES_URL = "http://{ip}:{port}/coord/nodes";
+    private static final String NODES_BY_ID_URL = NODES_URL + "/{nodeId}";
 
     /* TODO: remove singleton */
     private final AppProperty appProperty = AppProperty.getInstance();
@@ -215,7 +217,34 @@ public class InternalNodeUtilService implements NodeUtilService {
             );
 
             if(registrationEntity.getStatusCode() == HttpStatus.CREATED) {
-                log.info(String.format("Registration successful: %s", registrationEntity.getHeaders().getLocation().toASCIIString()));
+
+                final String createdNodeLocation = registrationEntity.getHeaders().getLocation().toASCIIString();
+
+                log.info(String.format("Registration successful: %s", createdNodeLocation));
+
+                final NodeStatusDto createdNodeDto = restTemplate.getForObject(
+                        createdNodeLocation,
+                        NodeStatusDto.class
+                );
+
+                final NetworkStatusDto updatedNetworkStatusDto = restTemplate.getForObject(
+                        STATUS_URL,
+                        NetworkStatusDto.class,
+                        nodeIpAddress,
+                        DEFAULT_NODES_PORT
+                );
+
+                appProperty.setSelfNode(DtoConverters.nodeStatusDtoToNodeInfo.apply(createdNodeDto));
+                appProperty.setCoordinatorNode(DtoConverters.nodeStatusDtoToNodeInfo.apply(updatedNetworkStatusDto.getCoordinator()));
+                appProperty.setListOfAvaiableNodes(
+                        updatedNetworkStatusDto.getNodes().stream()
+                                .filter(nodeStatusDto -> nodeStatusDto.getNodeId() != createdNodeDto.getNodeId())
+                                .map(DtoConverters.nodeStatusDtoToNodeInfo)
+                                .collect(Collectors.toList())
+                );
+
+
+
             } else {
                 log.info("Could not register new node :(");
                 throw new RuntimeException("Could not register new node :(");

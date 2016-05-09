@@ -50,7 +50,7 @@ public class IntNodeServerApplication {
 
 			options.addOption(nodeIpOption);
 
-			Try.of(() -> commandLineParser.parse(options, args))
+			Try.of(() -> commandLineParser.parse(options, args, true))
 					.andThen((commandLine) -> {
 						if(!commandLine.hasOption("node-address") || StringUtils.isEmpty(commandLine.getOptionValue("node-address"))) {
 							throw new RuntimeException("No node address specified!");
