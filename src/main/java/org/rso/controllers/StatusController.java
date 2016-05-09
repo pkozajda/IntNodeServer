@@ -4,7 +4,10 @@ import lombok.extern.java.Log;
 import org.rso.dto.DtoConverters;
 import org.rso.dto.NetworkStatusDto;
 import org.rso.utils.AppProperty;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import static java.util.stream.Collectors.toList;
@@ -21,5 +24,19 @@ public class StatusController {
                 .coordinator(DtoConverters.nodeInfoToNodeStatusDto.apply(appProperty.getCoordinatorNode()))
                 .nodes(appProperty.getAvailableNodes().stream().map(DtoConverters.nodeInfoToNodeStatusDto).collect(toList()))
                 .build();
+    }
+
+    @RequestMapping(value = "/status", method = RequestMethod.POST)
+    public ResponseEntity<Void> setNetworkStatus(@RequestBody final NetworkStatusDto networkStatusDto) {
+
+        /* TODO:
+              NetworkStatusDto validation.
+              Maybe send only updates not entire network status table
+         */
+
+        appProperty.setCoordinatorNode(DtoConverters.nodeStatusDtoToNodeInfo.apply(networkStatusDto.getCoordinator()));
+        appProperty.setListOfAvaiableNodes(networkStatusDto.getNodes().stream().map(DtoConverters.nodeStatusDtoToNodeInfo).collect(toList()));
+
+        return ResponseEntity.noContent().build();
     }
 }
