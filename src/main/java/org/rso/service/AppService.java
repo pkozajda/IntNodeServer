@@ -13,4 +13,5 @@ public interface AppService {
 
     void getGraduateInUniversityInCountry(NodeInfo nodeInfo, long countryId);
 
+    void uploadJobToCoordinator(NodeInfo nodeInfo);
 }

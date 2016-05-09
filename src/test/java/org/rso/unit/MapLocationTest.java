@@ -1,10 +1,10 @@
 package org.rso.unit;
 
-import junit.framework.Assert;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rso.IntNodeServerApplication;
-import org.rso.controllers.config.LocationMap;
+import org.rso.config.LocationMap;
 import org.rso.utils.Location;
 import org.rso.utils.NodeInfo;
 import org.rso.utils.NodeType;
@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = IntNodeServerApplication.class)
@@ -30,12 +32,12 @@ public class MapLocationTest {
         locationMap.add(Location.DOLNOSLASKIE,nodeInfo);
         locationMap.add(Location.DOLNOSLASKIE,nodeInfo1);
 
-        Assert.assertEquals(2,locationMap.getNodesByLocation(Location.DOLNOSLASKIE).size());
+        assertEquals(2, locationMap.getNodesByLocation(Location.DOLNOSLASKIE).size());
 
         locationMap.removeNodeInfo(nodeInfo);
 
-        Assert.assertEquals(1,locationMap.getNodesByLocation(Location.DOLNOSLASKIE).size());
-        Assert.assertEquals(0,locationMap.getNodesByLocation(Location.MAZOWIECKIE).size());
+        assertEquals(1, locationMap.getNodesByLocation(Location.DOLNOSLASKIE).size());
+        assertEquals(0, locationMap.getNodesByLocation(Location.MAZOWIECKIE).size());
 
     }
 

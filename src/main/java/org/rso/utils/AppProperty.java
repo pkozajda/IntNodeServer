@@ -61,5 +61,11 @@ public class AppProperty {
     public List<String> getAvaiableNodesIpAddresses(){
         return this.listOfAvaiableNodes.stream().map(p->p.getNodeIPAddress()).collect(Collectors.toCollection(ArrayList::new));
     }
+
+    public boolean isSelfCoordinator(){
+        return selfNode.equals(coordinatorNode);
+    }
+
+
 }
 
