@@ -32,5 +32,4 @@ public class ExampleController {
         return new ResponseEntity(locationMap.getNodesByLocation(Location.DOLNOSLASKIE), HttpStatus.OK);
     }
 
-
 }
