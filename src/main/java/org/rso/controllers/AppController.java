@@ -24,15 +24,4 @@ public class AppController {
         return HttpStatus.ACCEPTED;
     }
 
-    @RequestMapping(value = "/universities")
-    public HttpStatus getGraduateInUniversity(@RequestBody NodeInfo nodeInfo){
-        appService.getGraduateInUniversity(nodeInfo);
-        return HttpStatus.ACCEPTED;
-    }
-    @RequestMapping(value = "/universities/{countryId}")
-    public HttpStatus getGraduateInUniversityInCountry(@RequestBody NodeInfo nodeInfo,@PathVariable("countryId")long countryId){
-        appService.getGraduateInUniversityInCountry(nodeInfo,countryId );
-        return HttpStatus.ACCEPTED;
-    }
-
 }
