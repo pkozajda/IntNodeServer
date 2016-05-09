@@ -3,6 +3,7 @@ package org.rso.controllers;
 import lombok.extern.java.Log;
 import org.rso.dto.DtoConverters;
 import org.rso.dto.NodeStatusDto;
+import org.rso.exceptions.NodeNotFoundException;
 import org.rso.service.NodeUtilService;
 import org.rso.utils.AppProperty;
 import org.rso.utils.NodeInfo;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.Optional;
 
 @Log
 @RestController
@@ -66,7 +68,8 @@ public class ElectionController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
 
-        final NodeInfo coordinatorNode = appProperty.getNodeById(coordinator.getNodeId());
+        final NodeInfo coordinatorNode = Optional.ofNullable(appProperty.getNodeById(coordinator.getNodeId()))
+                .orElseThrow(() -> new NodeNotFoundException(String.format("Node with id = %s does not exist", coordinator.getNodeId())));
 
 
         final NodeInfo newCoordinatorNode = NodeInfo.builder()

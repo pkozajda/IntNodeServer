@@ -5,9 +5,11 @@ import lombok.Setter;
 import lombok.extern.java.Log;
 import org.rso.exceptions.NodeNotFoundException;
 
+import javax.validation.constraints.Max;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Log
@@ -18,6 +20,8 @@ public class AppProperty {
     private NodeInfo selfNode;
     @Getter @Setter
     private NodeInfo coordinatorNode;
+
+    private AtomicInteger idCounter = null;
 
     private List<NodeInfo> listOfAvaiableNodes = new ArrayList<>();
 
@@ -30,6 +34,31 @@ public class AppProperty {
             appProperty = new AppProperty();
         }
         return appProperty;
+    }
+
+    public synchronized NodeInfo allocateNewNode() {
+
+        /* TODO:
+               This is retarded. Change appProeprty impleemntation to Map
+         */
+        if(idCounter == null) {
+
+            if(selfNode == null && coordinatorNode == null) {
+                idCounter = new AtomicInteger(1);
+            } else {
+                final int availableNodesMax = listOfAvaiableNodes.stream().map(NodeInfo::getNodeId).mapToInt(Integer::intValue).max().getAsInt();
+
+                idCounter = new AtomicInteger(
+                        Math.max(Math.max(availableNodesMax, selfNode.getNodeId()), coordinatorNode.getNodeId())
+                );
+            }
+        }
+
+        return NodeInfo.builder()
+                .nodeId(idCounter.incrementAndGet())
+                .nodeIPAddress("")
+                .nodeType(NodeType.INTERNAL)
+                .build();
     }
 
     public synchronized void setLastCoordinatorPresence(Date lastCoordinatorPresence) {
@@ -68,7 +97,8 @@ public class AppProperty {
         return getAvailableNodes().stream()
                 .filter(node -> node.getNodeId() == nodeId)
                 .findFirst()
-                .orElseThrow(() -> new NodeNotFoundException(String.format("Node with id = %s does not exist", nodeId)));
+                .orElse(null);
+//                .orElseThrow(() -> new NodeNotFoundException(String.format("Node with id = %s does not exist", nodeId)));
     }
 
 }

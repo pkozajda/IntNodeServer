@@ -13,13 +13,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
+import javax.annotation.Resource;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -45,11 +46,15 @@ public class InternalNodeUtilService implements NodeUtilService {
     @Value("${timeout.request.connect}")
     private int connectionTimeout;
 
+//    @Resource
+//    private NodeNetworkService nodeNetworkService;
+
     private static final String DEFAULT_NODES_PORT = "8080";
     private static final String HEARTBEAT_URL = "http://{ip}:{port}/utils/heartbeat";
     private static final String ELECTION_URL = "http://{ip}:{port}/utils/election";
     private static final String COORDINATOR_URL = "http://{ip}:{port}/utils/coordinator";
     private static final String STATUS_URL = "http://{ip}:{port}/utils/status";
+    private static final String NODES_URL = "http://{ip}:{port}/coord/nodes";
 
     /* TODO: remove singleton */
     private final AppProperty appProperty = AppProperty.getInstance();
@@ -97,8 +102,10 @@ public class InternalNodeUtilService implements NodeUtilService {
             });
         });
 
+        /* TODO:
+                Do not send any updates if nothing changed!
+         */
         /* Inform all the remaining nodes about changes in network */
-
         final NetworkStatusDto updatedNetworkStatusDto = NetworkStatusDto.builder()
                 .coordinator(DtoConverters.nodeInfoToNodeStatusDto.apply(appProperty.getCoordinatorNode()))
                 .nodes(appProperty.getAvailableNodes().stream().map(DtoConverters.nodeInfoToNodeStatusDto).collect(toList()))
@@ -173,6 +180,48 @@ public class InternalNodeUtilService implements NodeUtilService {
 
             }
         }
+    }
+
+    /* TODO: Refactor */
+    @Override
+    public void connectToNetwork(final String nodeIpAddress) {
+        assert !StringUtils.isEmpty(nodeIpAddress);
+
+        log.info(String.format("Trying to connect to network using node %s configuration", nodeIpAddress));
+
+        /* Get network configuration from node */
+        Try.run(() -> {
+            final NetworkStatusDto networkStatusDto = restTemplate.getForObject(
+                    STATUS_URL,
+                    NetworkStatusDto.class,
+                    nodeIpAddress,
+                    DEFAULT_NODES_PORT
+            );
+
+            final NodeStatusDto coordinatorStatusDto = Optional.ofNullable(networkStatusDto.getCoordinator())
+                    .orElseThrow(() -> new RuntimeException(String.format("Cannot retrieve network coordinator details from %s", nodeIpAddress)));
+
+            log.info(String.format("Retrieved network configuration from %s.\nContacting network coordinator %s (id: %s)",
+                    nodeIpAddress, coordinatorStatusDto.getNodeIPAddress(), coordinatorStatusDto.getNodeId()));
+
+            /* Contact coordinator to get registered into network */
+
+            final ResponseEntity<Void> registrationEntity = restTemplate.postForEntity(
+                    NODES_URL,
+                    null,
+                    Void.class,
+                    coordinatorStatusDto.getNodeIPAddress(),
+                    DEFAULT_NODES_PORT
+            );
+
+            if(registrationEntity.getStatusCode() == HttpStatus.CREATED) {
+                log.info(String.format("Registration successful: %s", registrationEntity.getHeaders().getLocation().toASCIIString()));
+            } else {
+                log.info("Could not register new node :(");
+                throw new RuntimeException("Could not register new node :(");
+            }
+
+        }).onFailure((e) -> { throw new RuntimeException(e.getMessage()); });
     }
 
     /* TODO: Refactor using Yoda Time */
