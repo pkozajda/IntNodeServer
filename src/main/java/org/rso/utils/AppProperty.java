@@ -46,11 +46,19 @@ public class AppProperty {
             if(selfNode == null && coordinatorNode == null) {
                 idCounter = new AtomicInteger(1);
             } else {
-                final int availableNodesMax = listOfAvaiableNodes.stream().map(NodeInfo::getNodeId).mapToInt(Integer::intValue).max().getAsInt();
 
-                idCounter = new AtomicInteger(
-                        Math.max(Math.max(availableNodesMax, selfNode.getNodeId()), coordinatorNode.getNodeId())
-                );
+                if(!listOfAvaiableNodes.isEmpty()) {
+                    final int availableNodesMax = listOfAvaiableNodes.stream().map(NodeInfo::getNodeId).mapToInt(Integer::intValue).max().getAsInt();
+
+                    idCounter = new AtomicInteger(
+                            Math.max(Math.max(availableNodesMax, selfNode.getNodeId()), coordinatorNode.getNodeId())
+                    );
+                } else {
+                    idCounter = new AtomicInteger(
+                            Math.max(selfNode.getNodeId(), coordinatorNode.getNodeId())
+                    );
+                }
+
             }
         }
 
