@@ -64,6 +64,8 @@ public class IntNodeServerApplication {
 						final AnnotationConfigApplicationContext configurationCtx = new AnnotationConfigApplicationContext(CommandLineContext.class);
 						final NodeUtilService nodeUtilService = configurationCtx.getBean("internalNodeUtilService", NodeUtilService.class);
 
+						SpringApplication.run(IntNodeServerApplication.class, args);
+
 						nodeUtilService.connectToNetwork(nodeIpAddress);
 
 						configurationCtx.close();
@@ -82,10 +84,12 @@ public class IntNodeServerApplication {
 			nodesCfgService.getInternalNodes().stream()
 					.forEach(appProperty::addAvaiableNode);
 
+			configurationCtx.close();
+
+			SpringApplication.run(IntNodeServerApplication.class, args);
+
 			/* TODO: cleanup context */
 		}
-
-		SpringApplication.run(IntNodeServerApplication.class, args);
 	}
 
 	@Configuration
