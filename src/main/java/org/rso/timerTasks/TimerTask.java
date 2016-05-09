@@ -5,33 +5,36 @@ import org.rso.service.InternalNodeUtilService;
 import org.rso.utils.AppProperty;
 import org.rso.utils.NodeType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 
-@Component
 @Log
+@Component
 public class TimerTask {
-    private static final int PERIOD_OF_TIME = 2000; // in milliseconds
 
     @Autowired
     private InternalNodeUtilService utilService;
 
-//    wykonuje koordator
-    @Scheduled(fixedRate = PERIOD_OF_TIME)
-    public void doHeartBeat(){
-        NodeType selfType = AppProperty.getInstance().getSelfNode().getNodeType();
-        if(selfType==NodeType.INTERNAL_COORDINATOR){
+    private AppProperty appProperty = AppProperty.getInstance();
+
+    /* Heartbeat procedure task - executed by current coordinator */
+    @Scheduled(fixedRateString = "${delay.heartbeat}")
+    public void heartbeatTask() {
+        final NodeType selfType = appProperty.getSelfNode().getNodeType();
+
+        if(selfType == NodeType.INTERNAL_COORDINATOR) {
             utilService.doHeartBeat();
         }
     }
 
-//    wykonuje zwykly wezel
-    @Scheduled(fixedRate = PERIOD_OF_TIME)
-//    TODO co jaki czas sprawdza obecnosc koordynatora zwykly wezel
-    public void verifyCoordinatorPresence(){
-        NodeType selfType = AppProperty.getInstance().getSelfNode().getNodeType();
-        if(selfType==NodeType.INTERNAL){
+    /* Coordinator presence verification task - executed by each internal node */
+    @Scheduled(fixedRateString = "${delay.coordinator.check}")
+    public void coordinatorPresenceVerificationTask() {
+        final NodeType selfType = appProperty.getSelfNode().getNodeType();
+
+        if(selfType == NodeType.INTERNAL) {
             utilService.verifyCoordinatorPresence();
         }
     }
