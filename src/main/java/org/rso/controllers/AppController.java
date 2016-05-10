@@ -1,6 +1,5 @@
 package org.rso.controllers;
 
-import com.sun.xml.internal.bind.v2.TODO;
 import lombok.extern.java.Log;
 import org.rso.service.AppServiceImpl;
 import org.rso.utils.AppProperty;
@@ -26,7 +25,7 @@ public class AppController {
 
     @RequestMapping(value = "/allCountries",method = RequestMethod.POST)
     public @ResponseBody ResponseEntity getGraduateInCountry(@RequestBody NodeInfo nodeInfo){
-        if(appProperty.isSelfCoordinator()){
+        if(appProperty.isSelfNodeCoordinator()){
             appService.getGraduteInCountry(nodeInfo);
         }else {
 //            TODO upload job to coordinator

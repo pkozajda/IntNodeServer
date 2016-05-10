@@ -100,7 +100,7 @@ public class AppProperty {
         return this.listOfAvaiableNodes.stream().map(p->p.getNodeIPAddress()).collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public boolean isSelfCoordinator(){
+    public boolean isSelfNodeCoordinator(){
         return selfNode.equals(coordinatorNode);
     }
 
