@@ -42,27 +42,5 @@ public class InsertGraduateController {
         return HttpStatus.ACCEPTED;
     }
 
-    @RequestMapping(value = "/insertInNode",method = RequestMethod.POST)
-    public @ResponseBody
-    ResponseEntity insertInNode(@RequestBody GraduateInsertDto graduateInsertDto){
-        try {
-            Graduate graduate = graduateService.insertGraduate(graduateInsertDto);
-            return ResponseEntity.ok(graduate);
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @RequestMapping(value = "/insertInNode",method = RequestMethod.POST)
-    public @ResponseBody
-    ResponseEntity insertAllInNode(@RequestBody List<GraduateInsertDto> graduateInsertDto){
-        try {
-            List<Graduate> graduate = graduateService.insertGraduates(graduateInsertDto);
-            return ResponseEntity.ok(graduate);
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
 
 }
