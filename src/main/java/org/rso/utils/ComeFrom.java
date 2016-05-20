@@ -6,3 +6,5 @@ package org.rso.utils;
 public enum ComeFrom {
     VILLAGE, SMALL_TOWN, MEDIUM_SIZED_TOWN, LARGE_TOWN
 }
+
+

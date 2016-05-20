@@ -16,5 +16,6 @@ public enum Location {
     LUBELSKIE,
     PODKARPADZKIE,
     MALOPOLSKIE,
-    SLASKIE
+    SLASKIE,
+    LAND
 }
