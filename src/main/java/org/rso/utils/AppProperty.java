@@ -5,7 +5,6 @@ import lombok.Setter;
 import lombok.extern.java.Log;
 import org.rso.exceptions.NodeNotFoundException;
 
-import javax.validation.constraints.Max;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +13,10 @@ import java.util.stream.Collectors;
 
 @Log
 public class AppProperty {
+
+    public static final int EXTERNAL_SERVER_PORT = 9000;
+    public static final int INTERNAL_SERVER_PORT = 8080;
+
     private static AppProperty appProperty;
     private Date lastCoordinatorPresence;
     @Getter @Setter
