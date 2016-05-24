@@ -6,7 +6,7 @@ package org.rso.utils;
 public enum JobType {
     GET_GRADUATES_FROM_ALL_COUNTRIES("/allCountries"),
     GET_GRADUATES_FROM_ALL_UNIVERSITIES("/universities"),
-    GET_GRADUATES_FROM_ALL_FIELD_OF_STUDY("/fieldOfStudy"),
+    GET_GRADUATES_FROM_ALL_FIELD_OF_STUDY("/FieldOfStudy"),
     GET_GRADUATES_MORE_THAN_ONE_FIELD_OF_STUDY_COUNTRIES("/moreThanOneFieldOfStudy/country"),
     GET_GRADUATES_MORE_THAN_ONE_FIELD_OF_STUDY_UNIVERSITIES("/moreThanOneFieldOfStudy/university"),
     GET_STATISTIC_ORGIN_FROM_LAND("/orginFrom/land"),
