@@ -6,18 +6,10 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-import org.rso.mongo.entities.FieldOfStudy;
-import org.rso.mongo.entities.Graduate;
-import org.rso.mongo.entities.University;
-import org.rso.mongo.repo.UniversityRepo;
 import org.rso.service.InternalNodeUtilService;
 import org.rso.service.NodeUtilService;
 import org.rso.service.NodesCfgService;
 import org.rso.utils.AppProperty;
-import org.rso.utils.ComeFrom;
-import org.rso.utils.Location;
-import org.rso.utils.UniversityType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -30,15 +22,12 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
-
 @Log
 @EnableScheduling
 @SpringBootApplication
 public class IntNodeServerApplication implements CommandLineRunner{
 
-    @Autowired
-    private UniversityRepo universityRepo;
+
 	/* TODO:
           1. Refactor this bs!
           2. Get rid of xml context configuration
@@ -107,16 +96,6 @@ public class IntNodeServerApplication implements CommandLineRunner{
 
 	@Override
 	public void run(String... strings) throws Exception {
-
-        universityRepo.deleteAll();
-        Graduate radek = new Graduate("radek","drozdz", ComeFrom.SMALL_TOWN, Location.DOLNOSLASKIE,new FieldOfStudy("informatyka"));
-        Graduate lkasz = new Graduate("lukasz","szaf", ComeFrom.SMALL_TOWN, Location.DOLNOSLASKIE,new FieldOfStudy("informatyka"));
-
-        University university = new University("PW","1829",Location.MAZOWIECKIE, UniversityType.POLYTECHNIC, Arrays.asList(radek,lkasz));
-        university = universityRepo.save(university);
-		log.info("*****************************************************************");
-        log.info(university.toString());
-		log.info("*****************************************************************");
 
 	}
 
