@@ -1,6 +1,5 @@
 package org.rso.utils;
 
-import org.rso.dto.UniversityDto;
 import org.rso.mongo.dto.GraduateDto;
 import org.rso.mongo.entities.Graduate;
 import org.rso.mongo.entities.University;
@@ -43,7 +42,7 @@ public class DataBasePopulator {
     }
 
     private Graduate createGraduate() {
-
+        return null;
     }
 
     private List<University> getUniversities(){
