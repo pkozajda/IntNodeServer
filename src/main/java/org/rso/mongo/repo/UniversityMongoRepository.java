@@ -14,7 +14,7 @@ import java.util.List;
  * Created by Radosław on 24.05.2016.
  */
 @Repository
-public class UniversityRepository {
+public class UniversityMongoRepository {
 
     @Autowired
     private MongoTemplate mongoTemplate;
@@ -46,5 +46,9 @@ public class UniversityRepository {
 
     public List<University> findAll(){
         return universityRepo.findAll();
+    }
+
+    public void clear() {
+        this.universityRepo.deleteAll();
     }
 }

@@ -17,12 +17,10 @@ import org.rso.utils.Location;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class GraduateDto {
-    private String index;
     private String name;
     private String surname;
     private ComeFrom comeFrom;
     private Location locationFrom;
     private FieldOfStudy fieldOfStudy;
     private UniversityDto universityDto;
-
 }

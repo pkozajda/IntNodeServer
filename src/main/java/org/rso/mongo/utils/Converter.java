@@ -5,6 +5,7 @@ import org.rso.mongo.dto.GraduateDto;
 import org.rso.mongo.entities.Graduate;
 import org.rso.mongo.entities.University;
 
+import java.util.ArrayList;
 import java.util.function.Function;
 
 /**
@@ -27,5 +28,6 @@ public class Converter {
                     .location(universityDto.getLocation())
                     .universityType(universityDto.getUniversityType())
                     .yearOfFundation(universityDto.getYerOfFundation())
+                    .graduates(new ArrayList<>())
                     .build();
 }

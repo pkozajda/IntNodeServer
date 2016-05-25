@@ -19,6 +19,7 @@ public class AppConfig {
         return new JobQueue();
     }
 
+
     @Bean
     public JobTaskExecutorService jobTaskExecutorService(){
         JobTaskExecutorService jobTaskExecutorService = new JobTaskExecutorService(5,10,5000);
