@@ -36,4 +36,9 @@ public class AppCtrl {
     public ResponseEntity getGraduatesByLocationInAllFieldOfStudy(@PathVariable Location location){
         return new ResponseEntity(mongoAppService.getGraduatesByLocationInAllFieldOfStudy(location),HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/getStatisticOrginGraduateByLocation/{location}")
+    public ResponseEntity getStatisticOrginGraduateByLocation(@PathVariable Location location){
+        return new ResponseEntity(mongoAppService.getStatisticOrginGraduateByLocation(location),HttpStatus.OK);
+    }
 }

@@ -7,6 +7,7 @@ import org.rso.mongo.dto.LocationValueDto;
 import org.rso.mongo.entities.Graduate;
 import org.rso.mongo.entities.University;
 import org.rso.mongo.utils.Converter;
+import org.rso.utils.ComeFrom;
 import org.rso.utils.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -86,9 +87,17 @@ public class UniversityMongoRepository {
         return map;
     }
 
-    private void addToMap(Map<String, Long> map, String fieldOfStudyName) {
-        map.computeIfPresent(fieldOfStudyName,(k,v)->v+1);
+    private void addToMap(Map map, String fieldOfStudyName) {
+        map.computeIfPresent(fieldOfStudyName,(k,v)->(long)v+1);
         map.putIfAbsent(fieldOfStudyName,1L);
     }
 
+    public Map<String, Long> getStatisticOrginGraduateByLocation(Location location) {
+
+        Map<String,Long> map = new HashMap<>();
+        for(University university: universityRepo.findByLocation(location)){
+            university.getGraduates().forEach(graduate -> addToMap(map,graduate.getComeFrom().toString()));
+        }
+        return map;
+    }
 }
