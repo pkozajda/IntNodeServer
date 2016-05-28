@@ -1,4 +1,4 @@
-package org.rso.utils;
+package org.rso.mongo.utils;
 
 import com.google.common.base.Predicate;
 import org.rso.mongo.dto.GraduateDto;
@@ -6,6 +6,9 @@ import org.rso.mongo.entities.FieldOfStudy;
 import org.rso.mongo.entities.Graduate;
 import org.rso.mongo.entities.University;
 import org.rso.mongo.repo.UniversityMongoRepository;
+import org.rso.utils.ComeFrom;
+import org.rso.utils.Location;
+import org.rso.utils.UniversityType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,11 +19,10 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-/**
- * Created by Radosław on 25.05.2016.
- */
 @Component
 public class DataBasePopulator {
+
+    private static final int BASE_POPULATION = 1000;
 
     @Autowired
     private UniversityMongoRepository universityRepository;
@@ -38,7 +40,7 @@ public class DataBasePopulator {
     private void populateDB() {
         for (University university: getUniversities()){
             Random random = new Random();
-            int val = random.nextInt(100)+1000;
+            int val = random.nextInt(1000)+BASE_POPULATION;
             List<GraduateDto> graduateDtoList = new ArrayList<>();
             for (int i = 0; i < val; i++) {
                 Graduate graduate = this.createGraduate();
@@ -51,7 +53,7 @@ public class DataBasePopulator {
     private Graduate createGraduate() {
         return Graduate.builder()
                 .name(randomName())
-                .surname(randomName())
+                .surname(randomSurname())
                 .comeFrom(randoComeFrom())
                 .locationFrom(randomLocation())
                 .fieldOfStudy(randomFieldOfStudy())
@@ -94,7 +96,7 @@ public class DataBasePopulator {
         return names.get(random.nextInt(names.size()));
     }
 
-    private String radnemSurname(){
+    private String randomSurname(){
 
         List<String> surnames = Arrays.asList("xxx","xxy","xxz","aaa","xbs","jdk","java","python","anaconda");
         return surnames.get(random.nextInt(surnames.size()));
@@ -102,7 +104,7 @@ public class DataBasePopulator {
 
     private List<University> getUniversities(){
         return Arrays.asList(
-                new University("PW","1820",Location.MAZOWIECKIE,UniversityType.POLYTECHNIC),
+                new University("PW","1820",Location.MAZOWIECKIE, UniversityType.POLYTECHNIC),
                 new University("UJ","1364",Location.MALOPOLSKIE,UniversityType.UNIVERSITY),
                 new University("SGGW","1820",Location.MAZOWIECKIE,UniversityType.AGRICULTURAL_UNIVERSITY),
                 new University("PK","1820",Location.MALOPOLSKIE,UniversityType.POLYTECHNIC),

@@ -1,9 +1,6 @@
 package org.rso.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.rso.utils.Location;
 import org.rso.utils.UniversityType;
 
@@ -15,9 +12,11 @@ import org.rso.utils.UniversityType;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+@Builder
 public class UniversityDto {
     private String name;
     private String yerOfFundation;
     private Location location;
     private UniversityType universityType;
+    private int count;
 }

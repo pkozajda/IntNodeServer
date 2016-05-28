@@ -1,14 +1,21 @@
 package org.rso.mongo.repo;
 
+import org.rso.dto.UniversityDto;
+import org.rso.mongo.dto.FieldOfStudyDto;
 import org.rso.mongo.dto.GraduateDto;
+import org.rso.mongo.dto.LocationValueDto;
 import org.rso.mongo.entities.Graduate;
 import org.rso.mongo.entities.University;
 import org.rso.mongo.utils.Converter;
+import org.rso.utils.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Radosław on 24.05.2016.
@@ -51,4 +58,37 @@ public class UniversityMongoRepository {
     public void clear() {
         this.universityRepo.deleteAll();
     }
+
+    public LocationValueDto getGraduatesByLocation(Location location) {
+        long res = universityRepo.findByLocation(location).stream()
+                .mapToInt( p->p.getGraduates().size()).sum();
+//        return null;
+        return new LocationValueDto(location,res);
+    }
+
+    public List<UniversityDto> getGraduatesByLocationInAllUniwersity(Location location) {
+        List<UniversityDto> result = new ArrayList<>();
+        for(University university: universityRepo.findByLocation(location)){
+            UniversityDto universityDto = Converter.universityMongoToDto.apply(university);
+            universityDto.setCount(university.getGraduates().size());
+            result.add(universityDto);
+        }
+        return result;
+    }
+
+    public Map<String, Long> getGraduatesByLocationInAllFieldOfStudy(Location location) {
+        List<FieldOfStudyDto> result = new ArrayList<>();
+        Map<String,Long> map = new HashMap<>();
+        for(University university: universityRepo.findByLocation(location)){
+            university.getGraduates().stream().forEach(graduate ->addToMap(map,graduate.getFieldOfStudy().getName())
+            );
+        }
+        return map;
+    }
+
+    private void addToMap(Map<String, Long> map, String fieldOfStudyName) {
+        map.computeIfPresent(fieldOfStudyName,(k,v)->v+1);
+        map.putIfAbsent(fieldOfStudyName,1L);
+    }
+
 }

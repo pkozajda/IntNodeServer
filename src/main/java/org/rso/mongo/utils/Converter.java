@@ -30,4 +30,12 @@ public class Converter {
                     .yearOfFundation(universityDto.getYerOfFundation())
                     .graduates(new ArrayList<>())
                     .build();
+
+    public static Function<University,UniversityDto> universityMongoToDto = university ->
+            UniversityDto.builder()
+                    .name(university.getName())
+                    .yerOfFundation(university.getYearOfFundation())
+                    .location(university.getLocation())
+                    .universityType(university.getUniversityType())
+                    .build();
 }

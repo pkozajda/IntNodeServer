@@ -28,4 +28,6 @@ public class JobController {
         jobService.registerJob(jobEntityDto);
         return new ResponseEntity("ok", HttpStatus.OK);
     }
+
+
 }
