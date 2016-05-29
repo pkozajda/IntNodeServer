@@ -17,4 +17,5 @@ public class LocationValueDto {
     private Location location;
     private long value;
 
+
 }

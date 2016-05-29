@@ -9,4 +9,5 @@ public interface JobService {
 
     void registerJob(JobEntityDto jobEntityDto);
 
+    void getGraduatesFromAllCountriesJob(JobEntityDto jobEntityDto);
 }
