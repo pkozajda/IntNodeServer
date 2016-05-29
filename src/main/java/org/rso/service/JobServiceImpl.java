@@ -3,6 +3,7 @@ package org.rso.service;
 import lombok.extern.java.Log;
 import org.rso.config.LocationMap;
 import org.rso.dto.JobEntityDto;
+import org.rso.dto.UniversityDto;
 import org.rso.entities.resposnObjct.LocationMapResponse;
 import org.rso.mongo.dto.LocationValueDto;
 import org.rso.utils.JobQueue;
@@ -10,12 +11,16 @@ import org.rso.utils.Location;
 import org.rso.utils.NodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,6 +54,7 @@ public class JobServiceImpl implements JobService {
 
 
     private static final String GRADUATE_BY_LOCATION = "http://{ip}:{port}/int/graduatesByLocation/{location}";
+    private static final String GRADUATE_BY_UNIVERSITIES = "http://{ip}:{port}/int/getGraduatesByLocationInAllUniwersity/{location}";
     private static final int BASE_PORT = 8080;
 
     @PostConstruct
@@ -68,7 +74,7 @@ public class JobServiceImpl implements JobService {
 
         List<LocationValueDto> result = new ArrayList<>();
         LocationMapResponse locationMapResponse = new LocationMapResponse();
-        for (Location location: Arrays.asList(Location.MALOPOLSKIE,Location.MAZOWIECKIE,Location.SWIETOKRZYSKIE,Location.POMORSKIE)){
+        for (Location location: avaiableLocation()){
             final String ipAddress = getResourceNodeIp(location);
             LocationValueDto res = restTemplate.getForObject(
                     GRADUATE_BY_LOCATION,
@@ -77,6 +83,7 @@ public class JobServiceImpl implements JobService {
                     BASE_PORT,
                     location
             );
+//            TODO if not responding try agian
 //            log.info(res.toString());
             result.add(res);
             locationMapResponse.addToMap(location,(int)res.getValue());
@@ -85,11 +92,37 @@ public class JobServiceImpl implements JobService {
         sendResponse(jobEntityDto,result);
     }
 
+    @Override
+    public void getGraduatesFromAllUniversities(JobEntityDto jobEntityDto) {
+        List<UniversityDto> result = new ArrayList<>();
+        for (Location location: avaiableLocation()){
+            final String ipAddress = getResourceNodeIp(location);
+
+            ResponseEntity<List<UniversityDto>> uniResponseEntity = restTemplate.exchange(
+                    GRADUATE_BY_UNIVERSITIES,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<UniversityDto>>() {
+                        @Override
+                        public Type getType() {
+                            return super.getType();
+                        }
+                    },
+                    ipAddress,
+                    BASE_PORT,
+                    location
+            );
+//            TODO if not responding try agian
+            result.addAll(uniResponseEntity.getBody());
+        }
+        sendResponse(jobEntityDto,result);
+    }
+
     private void sendResponse(JobEntityDto jobEntityDto, Object result){
         String ipAddress = jobEntityDto.getOrderCustomer().getNodeIPAddress();
         final String jobUrl = jobEntityDto.getJobType().getUrl();
         final String resUrl = "http://{ip}:{port}"+jobUrl+"/{jobId}";
-        log.info("wysylam cialo "+jobEntityDto.getResponsBody().toString());
+//        log.info("wysylam cialo "+jobEntityDto.getResponsBody().toString());
         try {
             restTemplate.postForObject(
                     resUrl,
@@ -111,5 +144,16 @@ public class JobServiceImpl implements JobService {
         return nodeInfos.get(randomNumber).getNodeIPAddress();
     }
 
+    private List<Location> avaiableLocation(){
+        return Arrays.asList(
+                Location.MAZOWIECKIE,
+                Location.MALOPOLSKIE,
+                Location.DOLNOSLASKIE,
+                Location.POMORSKIE,
+                Location.SWIETOKRZYSKIE,
+                Location.SLASKIE,
+                Location.PODKARPADZKIE
+        );
+    }
 
 }

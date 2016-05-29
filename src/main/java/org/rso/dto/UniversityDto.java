@@ -1,5 +1,6 @@
 package org.rso.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import org.rso.utils.Location;
 import org.rso.utils.UniversityType;
@@ -13,10 +14,11 @@ import org.rso.utils.UniversityType;
 @NoArgsConstructor
 @EqualsAndHashCode
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UniversityDto {
     private String name;
     private String yerOfFundation;
     private Location location;
     private UniversityType universityType;
-    private int count;
+    private int value;
 }

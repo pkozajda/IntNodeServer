@@ -7,7 +7,6 @@ import org.rso.mongo.dto.LocationValueDto;
 import org.rso.mongo.entities.Graduate;
 import org.rso.mongo.entities.University;
 import org.rso.mongo.utils.Converter;
-import org.rso.utils.ComeFrom;
 import org.rso.utils.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -71,7 +70,7 @@ public class UniversityMongoRepository {
         List<UniversityDto> result = new ArrayList<>();
         for(University university: universityRepo.findByLocation(location)){
             UniversityDto universityDto = Converter.universityMongoToDto.apply(university);
-            universityDto.setCount(university.getGraduates().size());
+            universityDto.setValue(university.getGraduates().size());
             result.add(universityDto);
         }
         return result;
