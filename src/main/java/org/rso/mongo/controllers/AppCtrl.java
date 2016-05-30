@@ -51,4 +51,14 @@ public class AppCtrl {
     public ResponseEntity getStatisticOrginGraduateByFieldOfStudies(@PathVariable Location location){
         return new ResponseEntity(mongoAppService.getStatisticOrginGraduateByFieldOfStudies(location),HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/getStatisticWorkingStudents/countries/{location}")
+    public ResponseEntity getStatisticWorkingStudentsByCountries(@PathVariable Location location){
+        return new ResponseEntity(mongoAppService.getStatisticWorkingStudentsByCountries(location),HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/getStatisticWorkingStudents/universities/{location}")
+    public ResponseEntity getStatisticWorkingStudentsByUniverities(@PathVariable Location location){
+        return new ResponseEntity(mongoAppService.getStatisticWorkingStudentsByUniverities(location),HttpStatus.OK);
+    }
 }

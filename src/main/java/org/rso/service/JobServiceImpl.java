@@ -58,6 +58,8 @@ public class JobServiceImpl implements JobService {
     private static final String GRADUATES_BY_ORGIN_BY_COUNTRIES = "http://{ip}:{port}/int/getStatisticOrginGraduateByLocation/countries/{location}";
     private static final String GRADUATES_BY_ORGIN_BY_UNIVERSITIES = "http://{ip}:{port}/int/getStatisticOrginGraduateByLocation/universities/{location}";
     private static final String GRADUATES_BY_ORGIN_BY_FIELD_OF_STUDY = "http://{ip}:{port}/int/getStatisticOrginGraduateByLocation/fieldOfStudy/{location}";
+    private static final String GRADUATES_WORKING_BY_COUNTRIES = "http://{ip}:{port}/int/getStatisticWorkingStudents/countries/{location}";
+    private static final String GRADUATES_WORKING_BY_UNIVERSITIES = "http://{ip}:{port}/int/getStatisticWorkingStudents/universities/{location}";
     private static final int BASE_PORT = 8080;
 
 
@@ -99,26 +101,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public void getGraduatesFromAllUniversities(JobEntityDto jobEntityDto) {
         List<UniversityDto> result = new ArrayList<>();
-        for (Location location : avaiableLocation()) {
-            final String ipAddress = getResourceNodeIp(location);
-
-            ResponseEntity<List<UniversityDto>> uniResponseEntity = restTemplate.exchange(
-                    GRADUATE_BY_UNIVERSITIES,
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<List<UniversityDto>>() {
-                        @Override
-                        public Type getType() {
-                            return super.getType();
-                        }
-                    },
-                    ipAddress,
-                    BASE_PORT,
-                    location
-            );
-//            TODO if not responding try agian
-            result.addAll(uniResponseEntity.getBody());
-        }
+        getFromUniversityDto(result,GRADUATES_BY_ORGIN_BY_COUNTRIES);
         sendResponse(jobEntityDto, result);
     }
 
@@ -187,14 +170,45 @@ public class JobServiceImpl implements JobService {
 //        TODO not implemented!
         List<FieldOfStudyComeFromDto> result = new ArrayList<>();
         result.add(new FieldOfStudyComeFromDto(new FieldOfStudy("TODO"),Arrays.asList()));
-        for (Location location : avaiableLocation()) {
+        sendResponse(jobEntityDto, result);
+    }
+
+    @Override
+    public void getStatisticWorkingStudentsCountries(JobEntityDto jobEntityDto) {
+        List<LocationValueDto> result = new ArrayList<>();
+        for(Location location: avaiableLocation()){
             final String ipAddress = getResourceNodeIp(location);
-            Map<FieldOfStudy, List<ComeFromDto>> map = new HashMap<>();
-            ResponseEntity<List<FieldOfStudyComeFromDto>> listResponseEntity = restTemplate.exchange(
-                    GRADUATES_BY_ORGIN_BY_FIELD_OF_STUDY,
+            ResponseEntity<LocationValueDto> locationValueDtoResponseEntity = restTemplate.exchange(
+                    GRADUATES_WORKING_BY_COUNTRIES,
                     HttpMethod.GET,
                     null,
-                    new ParameterizedTypeReference<List<FieldOfStudyComeFromDto>>() {
+                    LocationValueDto.class,
+                    ipAddress,
+                    BASE_PORT,
+                    location
+            );
+            result.add(locationValueDtoResponseEntity.getBody());
+//            TODO if not responding try agian
+        }
+        sendResponse(jobEntityDto,result);
+    }
+
+    @Override
+    public void getStatisticWorkingStudentsUniversities(JobEntityDto jobEntityDto) {
+        List<UniversityDto> res = new ArrayList<>();
+        getFromUniversityDto(res,GRADUATES_WORKING_BY_UNIVERSITIES);
+        sendResponse(jobEntityDto,res);
+    }
+
+    private void getFromUniversityDto(List<UniversityDto> res, String url) {
+        for(Location location: avaiableLocation()){
+            final String ipAddress = getResourceNodeIp(location);
+//            log.info("");
+            ResponseEntity<List<UniversityDto>> listResponseEntity = restTemplate.exchange(
+                    url,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<UniversityDto>>() {
                         @Override
                         public Type getType() {
                             return super.getType();
@@ -204,8 +218,14 @@ public class JobServiceImpl implements JobService {
                     BASE_PORT,
                     location
             );
+//            TODO if not responding try agian
+            res.addAll(listResponseEntity.getBody());
         }
-        sendResponse(jobEntityDto, result);
+    }
+
+    @Override
+    public void getStatisticWorkingStudentsFieldOfStudy(JobEntityDto jobEntityDto) {
+
     }
 
     @Override

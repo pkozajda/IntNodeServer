@@ -22,4 +22,10 @@ public interface JobService {
     void getStatisticOrginFromUniversities(JobEntityDto jobEntityDto);
 
     void getStatisticOrginFromFieldOfStudy(JobEntityDto jobEntityDto);
+
+    void getStatisticWorkingStudentsCountries(JobEntityDto jobEntityDto);
+
+    void getStatisticWorkingStudentsUniversities(JobEntityDto jobEntityDto);
+
+    void getStatisticWorkingStudentsFieldOfStudy(JobEntityDto jobEntityDto);
 }

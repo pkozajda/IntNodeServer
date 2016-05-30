@@ -119,4 +119,23 @@ public class UniversityMongoRepository {
     public List<FieldOfStudyComeFromDto> getStatisticOrginGraduateByFieldOfStudies(Location location) {
         return Arrays.asList(new FieldOfStudyComeFromDto(new FieldOfStudy("TODO"), Arrays.asList()));
     }
+
+    public LocationValueDto getStatisticWorkingStudentsByCountries(Location location) {
+        long val = 0L;
+        for(University university: universityRepo.findByLocation(location)){
+            val+=university.getGraduates().stream().filter(Graduate::isWorkedAtStudy).count();
+        }
+        return new LocationValueDto(location,val);
+    }
+
+    public List<UniversityDto> getStatisticWorkingStudentsByUniverities(Location location) {
+        List<UniversityDto> result = new ArrayList<>();
+        for(University university: universityRepo.findByLocation(location)){
+            long val = university.getGraduates().stream().filter(Graduate::isWorkedAtStudy).count();
+            UniversityDto universityDto = Converter.universityMongoToDto.apply(university);
+            universityDto.setValue((int) val);
+            result.add(universityDto);
+        }
+        return result;
+    }
 }
