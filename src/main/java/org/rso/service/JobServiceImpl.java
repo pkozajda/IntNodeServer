@@ -162,7 +162,18 @@ public class JobServiceImpl implements JobService {
     public void getStatisticOrginFromLand(JobEntityDto jobEntityDto) {
         List<ComeFromDto> result = new ArrayList<>();
         Map<ComeFrom,Long> map = new HashMap<>();
-
+        getStatisticOrginFromCountriesAbstract().stream()
+                .map(elem->elem.getComeFromDtos())
+                .forEach(
+                        elem -> elem.stream().forEach( p->{
+                            map.computeIfPresent(p.getComeFrom(),(k,v)->v+=p.getVal());
+                            map.putIfAbsent(p.getComeFrom(),p.getVal());
+                        }
+                        )
+                );
+        for(ComeFrom comeFrom: map.keySet()){
+            result.add(new ComeFromDto(comeFrom,map.get(comeFrom)));
+        }
         sendResponse(jobEntityDto,result);
     }
 
