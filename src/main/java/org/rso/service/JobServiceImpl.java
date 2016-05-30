@@ -5,10 +5,7 @@ import org.rso.config.LocationMap;
 import org.rso.dto.JobEntityDto;
 import org.rso.dto.UniversityDto;
 import org.rso.entities.resposnObjct.LocationMapResponse;
-import org.rso.mongo.dto.ComeFromDto;
-import org.rso.mongo.dto.FieldOfStudyDto;
-import org.rso.mongo.dto.LocationComeFromDto;
-import org.rso.mongo.dto.LocationValueDto;
+import org.rso.mongo.dto.*;
 import org.rso.utils.ComeFrom;
 import org.rso.utils.JobQueue;
 import org.rso.utils.Location;
@@ -56,9 +53,9 @@ public class JobServiceImpl implements JobService {
 
     private static final String GRADUATE_BY_LOCATION = "http://{ip}:{port}/int/graduatesByLocation/{location}";
     private static final String GRADUATE_BY_UNIVERSITIES = "http://{ip}:{port}/int/getGraduatesByLocationInAllUniwersity/{location}";
-
     private static final String GRADUATE_BY_FIELD_OF_STUDIES = "http://{ip}:{port}/int/getGraduatesByLocationInAllFieldOfStudy/{location}";
     private static final String GRADUATES_BY_ORGIN_BY_COUNTRIES = "http://{ip}:{port}/int/getStatisticOrginGraduateByLocation/countries/{location}";
+    private static final String GRADUATES_BY_ORGIN_BY_UNIVERSITIES = "http://{ip}:{port}/int/getStatisticOrginGraduateByLocation/universities/{location}";
     private static final int BASE_PORT = 8080;
 
 
@@ -159,6 +156,31 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public void getStatisticOrginFromUniversities(JobEntityDto jobEntityDto) {
+        List<UniversityComeFromDto> result = new ArrayList<>();
+        for(Location location: avaiableLocation()){
+            final String ipAddress = getResourceNodeIp(location);
+            ResponseEntity<List<UniversityComeFromDto>> listResponseEntity = restTemplate.exchange(
+                    GRADUATES_BY_ORGIN_BY_UNIVERSITIES,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<UniversityComeFromDto>>() {
+                        @Override
+                        public Type getType() {
+                            return super.getType();
+                        }
+                    },
+                    ipAddress,
+                    BASE_PORT,
+                    location
+            );
+//            TODO if not responding try agian
+            result.addAll(listResponseEntity.getBody());
+        }
+        sendResponse(jobEntityDto,result);
+    }
+
+    @Override
     public void getStatisticOrginFromLand(JobEntityDto jobEntityDto) {
         List<ComeFromDto> result = new ArrayList<>();
         Map<ComeFrom,Long> map = new HashMap<>();
@@ -179,9 +201,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void getStatisticOrginFromCountries(JobEntityDto jobEntityDto) {
-        List<LocationComeFromDto> result = new ArrayList<>();
-        result = getStatisticOrginFromCountriesAbstract();
-        sendResponse(jobEntityDto, result);
+        sendResponse(jobEntityDto, getStatisticOrginFromCountriesAbstract());
     }
 
 

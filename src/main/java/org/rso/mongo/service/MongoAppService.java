@@ -4,6 +4,7 @@ import org.rso.dto.UniversityDto;
 import org.rso.mongo.dto.ComeFromDto;
 import org.rso.mongo.dto.FieldOfStudyDto;
 import org.rso.mongo.dto.LocationValueDto;
+import org.rso.mongo.dto.UniversityComeFromDto;
 import org.rso.mongo.exceptions.LocationDoesNotExist;
 import org.rso.mongo.repo.UniversityMongoRepository;
 import org.rso.utils.ComeFrom;
@@ -32,10 +33,6 @@ public class MongoAppService {
             throw new LocationDoesNotExist(String.format("location %s does not exist!!! ",location.toString()));
         }
         return universityMongoRepository.getGraduatesByLocation(location);
-    }
-
-    private boolean isLocationExist(Location location) {
-        return Arrays.asList(Location.values()).contains(location);
     }
 
     public List<UniversityDto> getGraduatesByLocationInAllUniwersity(Location location) {
@@ -69,5 +66,17 @@ public class MongoAppService {
             resList.add(new ComeFromDto(ComeFrom.valueOf(k),val));
         }
         return resList;
+    }
+
+    public List<UniversityComeFromDto> getStatisticOrginGaduateByUniversities(Location location) {
+        if(!isLocationExist(location)){
+            throw new LocationDoesNotExist(String.format("location %s does not exist!!! ",location.toString()));
+        }
+        return universityMongoRepository.getStatisticOrginGaduateByUniversities(location);
+//        return result;
+    }
+
+    private boolean isLocationExist(Location location) {
+        return Arrays.asList(Location.values()).contains(location);
     }
 }
