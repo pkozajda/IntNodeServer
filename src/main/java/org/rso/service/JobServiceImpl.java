@@ -5,6 +5,7 @@ import org.rso.config.LocationMap;
 import org.rso.dto.JobEntityDto;
 import org.rso.dto.UniversityDto;
 import org.rso.entities.resposnObjct.LocationMapResponse;
+import org.rso.mongo.dto.FieldOfStudyDto;
 import org.rso.mongo.dto.LocationValueDto;
 import org.rso.utils.JobQueue;
 import org.rso.utils.Location;
@@ -21,10 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Radosław on 23.05.2016.
@@ -55,6 +53,7 @@ public class JobServiceImpl implements JobService {
 
     private static final String GRADUATE_BY_LOCATION = "http://{ip}:{port}/int/graduatesByLocation/{location}";
     private static final String GRADUATE_BY_UNIVERSITIES = "http://{ip}:{port}/int/getGraduatesByLocationInAllUniwersity/{location}";
+    private static final String GRADUATE_BY_FIELD_OF_STUDIES = "http://{ip}:{port}/int/getGraduatesByLocationInAllFieldOfStudy/{location}";
     private static final int BASE_PORT = 8080;
 
     @PostConstruct
@@ -117,6 +116,42 @@ public class JobServiceImpl implements JobService {
         }
         sendResponse(jobEntityDto,result);
     }
+
+    @Override
+    public void getGraduatesFromAllFieldOfStudies(JobEntityDto jobEntityDto) {
+        List<FieldOfStudyDto> result = new ArrayList<>();
+        Map<String, Long> map = new HashMap<>();
+        for (Location location: avaiableLocation()){
+            final String ipAddress = getResourceNodeIp(location);
+            ResponseEntity<List<FieldOfStudyDto>> listResponseEntity = restTemplate.exchange(
+                    GRADUATE_BY_FIELD_OF_STUDIES,
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<List<FieldOfStudyDto>>() {
+                        @Override
+                        public Type getType() {
+                            return super.getType();
+                        }
+                    },
+                    ipAddress,
+                    BASE_PORT,
+                    location
+            );
+//            TODO if not responding try agian
+//            reduceResult(listResponseEntity.getBody(),map);
+            listResponseEntity.getBody().stream().forEach(le -> {
+                map.computeIfPresent(le.getName(),(k,v)->v+=le.getVal());
+                map.putIfAbsent(le.getName(),le.getVal());
+            });
+
+        }
+
+        for(String str: map.keySet()){
+            result.add(new FieldOfStudyDto(str,map.get(str)));
+        }
+        sendResponse(jobEntityDto,result);
+    }
+
 
     private void sendResponse(JobEntityDto jobEntityDto, Object result){
         String ipAddress = jobEntityDto.getOrderCustomer().getNodeIPAddress();

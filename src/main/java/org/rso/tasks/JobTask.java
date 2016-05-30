@@ -48,6 +48,10 @@ public class JobTask implements Runnable {
                 break;
             case GET_GRADUATES_FROM_ALL_UNIVERSITIES:
                 jobService.getGraduatesFromAllUniversities(jobEntityDto);
+                break;
+            case GET_GRADUATES_FROM_ALL_FIELD_OF_STUDY:
+                jobService.getGraduatesFromAllFieldOfStudies(jobEntityDto);
+                break;
             default:
                 break;
         }

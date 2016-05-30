@@ -12,4 +12,6 @@ public interface JobService {
     void getGraduatesFromAllCountriesJob(JobEntityDto jobEntityDto);
 
     void getGraduatesFromAllUniversities(JobEntityDto jobEntityDto);
+
+    void getGraduatesFromAllFieldOfStudies(JobEntityDto jobEntityDto);
 }
