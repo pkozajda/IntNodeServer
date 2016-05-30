@@ -2,6 +2,7 @@ package org.rso.mongo.repo;
 
 import org.rso.dto.UniversityDto;
 import org.rso.mongo.dto.*;
+import org.rso.mongo.entities.FieldOfStudy;
 import org.rso.mongo.entities.Graduate;
 import org.rso.mongo.entities.University;
 import org.rso.mongo.utils.Converter;
@@ -11,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Radosław on 24.05.2016.
@@ -116,5 +114,9 @@ public class UniversityMongoRepository {
             res.add(new UniversityComeFromDto(Converter.universityMongoToDto.apply(university),comeFromDtos));
         }
         return res;
+    }
+
+    public List<FieldOfStudyComeFromDto> getStatisticOrginGraduateByFieldOfStudies(Location location) {
+        return Arrays.asList(new FieldOfStudyComeFromDto(new FieldOfStudy("TODO"), Arrays.asList()));
     }
 }

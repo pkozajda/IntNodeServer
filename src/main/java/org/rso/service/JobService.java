@@ -20,4 +20,6 @@ public interface JobService {
     void getStatisticOrginFromCountries(JobEntityDto jobEntityDto);
 
     void getStatisticOrginFromUniversities(JobEntityDto jobEntityDto);
+
+    void getStatisticOrginFromFieldOfStudy(JobEntityDto jobEntityDto);
 }

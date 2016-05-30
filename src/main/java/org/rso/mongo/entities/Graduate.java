@@ -17,5 +17,6 @@ public class Graduate {
     private String surname;
     private ComeFrom comeFrom;
     private Location locationFrom;
+    private boolean workedAtStudy;
     private FieldOfStudy fieldOfStudy;
 }
