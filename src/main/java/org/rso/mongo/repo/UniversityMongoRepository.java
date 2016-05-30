@@ -138,4 +138,20 @@ public class UniversityMongoRepository {
         }
         return result;
     }
+
+    public List<FieldOfStudyDto> getStatisticWorkingStudentsByFieldOfStudy(Location location) {
+        List<FieldOfStudyDto> result = new ArrayList<>();
+        Map<FieldOfStudy,Long> map = new HashMap<>();
+        for(University university: universityRepo.findByLocation(location)){
+            university.getGraduates().stream().forEach(gr->{
+                FieldOfStudy fieldOfStudy = gr.getFieldOfStudy();
+                map.computeIfPresent(fieldOfStudy,(k,v)->v+=1);
+                map.putIfAbsent(fieldOfStudy,1L);
+            });
+        }
+        for(FieldOfStudy fieldOfStudy: map.keySet()){
+            result.add(new FieldOfStudyDto(fieldOfStudy.getName(),map.get(fieldOfStudy)));
+        }
+        return result;
+    }
 }

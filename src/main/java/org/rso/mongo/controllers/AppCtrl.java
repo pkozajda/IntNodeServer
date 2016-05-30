@@ -61,4 +61,9 @@ public class AppCtrl {
     public ResponseEntity getStatisticWorkingStudentsByUniverities(@PathVariable Location location){
         return new ResponseEntity(mongoAppService.getStatisticWorkingStudentsByUniverities(location),HttpStatus.OK);
     }
+
+    @RequestMapping(value = "/getStatisticWorkingStudents/fieldOfStudy/{location}")
+    public ResponseEntity getStatisticWorkingStudentsByFieldOfStudy(@PathVariable Location location){
+        return new ResponseEntity(mongoAppService.getStatisticWorkingStudentsByFieldOfStudy(location),HttpStatus.OK);
+    }
 }

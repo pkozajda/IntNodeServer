@@ -60,6 +60,7 @@ public class JobServiceImpl implements JobService {
     private static final String GRADUATES_BY_ORGIN_BY_FIELD_OF_STUDY = "http://{ip}:{port}/int/getStatisticOrginGraduateByLocation/fieldOfStudy/{location}";
     private static final String GRADUATES_WORKING_BY_COUNTRIES = "http://{ip}:{port}/int/getStatisticWorkingStudents/countries/{location}";
     private static final String GRADUATES_WORKING_BY_UNIVERSITIES = "http://{ip}:{port}/int/getStatisticWorkingStudents/universities/{location}";
+    private static final String GRADUATES_WORKING_BY_FIELD_OF_STUDY = "http://{ip}:{port}/int/getStatisticWorkingStudents/fieldOfStudy/{location}";
     private static final int BASE_PORT = 8080;
 
 
@@ -107,12 +108,16 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void getGraduatesFromAllFieldOfStudies(JobEntityDto jobEntityDto) {
+        fieldOfStudyDtoJob(jobEntityDto,GRADUATE_BY_FIELD_OF_STUDIES);
+    }
+
+    private void fieldOfStudyDtoJob(JobEntityDto jobEntityDto, String url) {
         List<FieldOfStudyDto> result = new ArrayList<>();
         Map<String, Long> map = new HashMap<>();
         for (Location location : avaiableLocation()) {
             final String ipAddress = getResourceNodeIp(location);
             ResponseEntity<List<FieldOfStudyDto>> listResponseEntity = restTemplate.exchange(
-                    GRADUATE_BY_FIELD_OF_STUDIES,
+                    url,
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<List<FieldOfStudyDto>>() {
@@ -225,7 +230,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void getStatisticWorkingStudentsFieldOfStudy(JobEntityDto jobEntityDto) {
-
+        fieldOfStudyDtoJob(jobEntityDto,GRADUATES_WORKING_BY_FIELD_OF_STUDY);
     }
 
     @Override
