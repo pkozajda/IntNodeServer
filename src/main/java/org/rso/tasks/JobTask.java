@@ -52,6 +52,11 @@ public class JobTask implements Runnable {
             case GET_GRADUATES_FROM_ALL_FIELD_OF_STUDY:
                 jobService.getGraduatesFromAllFieldOfStudies(jobEntityDto);
                 break;
+            case GET_STATISTIC_ORGIN_FROM_LAND:
+                jobService.getStatisticOrginFromLand(jobEntityDto);
+                break;
+            case GET_STATISTIC_ORGIN_FROM_COUNTRIES:
+                jobService.getStatisticOrginFromCountries(jobEntityDto);
             default:
                 break;
         }
