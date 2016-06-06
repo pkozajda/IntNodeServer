@@ -22,7 +22,7 @@ public class Converter {
                 .fieldOfStudy(graduateDto.getFieldOfStudy())
                 .build();
 
-    public static Function<UniversityDto,University> universityDtoTOUniversity = universityDto ->
+    public static Function<UniversityDto,University> universityDtoToEntity = universityDto ->
             University.builder()
                     .name(universityDto.getName())
                     .location(universityDto.getLocation())

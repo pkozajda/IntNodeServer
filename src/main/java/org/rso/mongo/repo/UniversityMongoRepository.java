@@ -33,7 +33,7 @@ public class UniversityMongoRepository {
             university.getGraduates().add(graduate);
             universityRepo.save(university);
         } else {
-            University newUniversity = Converter.universityDtoTOUniversity.apply(graduateDto.getUniversityDto());
+            University newUniversity = Converter.universityDtoToEntity.apply(graduateDto.getUniversityDto());
             Graduate graduate = Converter.graduateDtoToGraduate.apply(graduateDto);
             newUniversity.getGraduates().add(graduate);
             universityRepo.save(newUniversity);
