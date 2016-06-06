@@ -12,6 +12,7 @@ public class DtoConverters {
                     .nodeId(nodeInfo.getNodeId())
                     .nodeIPAddress(nodeInfo.getNodeIPAddress())
                     .nodeType(nodeInfo.getNodeType().name())
+                    .locations(nodeInfo.getLocations())
                     .build();
 
     public static Function<NodeStatusDto, NodeInfo> nodeStatusDtoToNodeInfo  = nodeStatusDto ->
@@ -19,6 +20,7 @@ public class DtoConverters {
                     .nodeId(nodeStatusDto.getNodeId())
                     .nodeIPAddress(nodeStatusDto.getNodeIPAddress())
                     .nodeType(NodeType.valueOf(nodeStatusDto.getNodeType()))
+                    .locations(nodeStatusDto.getLocations())
                     .build();
 
 }

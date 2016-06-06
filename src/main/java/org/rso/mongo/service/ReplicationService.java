@@ -1,5 +1,6 @@
 package org.rso.mongo.service;
 
+import javaslang.control.Try;
 import lombok.NonNull;
 import lombok.extern.java.Log;
 import org.rso.config.LocationMap;
@@ -61,7 +62,9 @@ public class ReplicationService {
     }
 
 
-    public void replicateLocation(@NonNull final Location location, @NonNull final NodeInfo nodeInfo) {
+    public Try<Void> replicateLocation(@NonNull final Location location, @NonNull final NodeInfo nodeInfo) {
+
+        log.info(String.format("Replicating %s on node: %d[%s]", location, nodeInfo.getNodeId(), nodeInfo.getNodeIPAddress()));
 
         final List<UniversityDto> universitiesForLocationDto = Optional.ofNullable(universityRepo.findByLocation(location))
                 .orElseThrow(() -> new RuntimeException(
@@ -81,5 +84,7 @@ public class ReplicationService {
             log.warning(String.format("Could replicate location: %s to node %d[%s]", location, nodeInfo.getNodeId(), nodeInfo.getNodeIPAddress()));
             throw new RuntimeException(String.format("Could not replicate data to node: %d[%s]", nodeInfo.getNodeId(), nodeInfo.getNodeIPAddress()));
         }
+
+        return Try.success(null);
     }
 }

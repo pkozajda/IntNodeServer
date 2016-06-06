@@ -2,12 +2,17 @@ package org.rso.config;
 
 
 import com.google.common.collect.ImmutableMap;
-import lombok.Getter;
+import lombok.NonNull;
 import org.rso.utils.AppProperty;
 import org.rso.utils.Location;
 import org.rso.utils.NodeInfo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.stream.Collectors.toList;
 
 
 public class LocationMap {
@@ -46,5 +51,12 @@ public class LocationMap {
 
     public Map<Location, List<NodeInfo>> getLocationMap() {
         return ImmutableMap.copyOf(locationMap);
+    }
+
+    public List<Location> getLocationsForNode(@NonNull final NodeInfo nodeInfo) {
+        return locationMap.entrySet().stream()
+                .filter(locationListEntry -> locationListEntry.getValue().contains(nodeInfo))
+                .map(Map.Entry::getKey)
+                .collect(toList());
     }
 }
