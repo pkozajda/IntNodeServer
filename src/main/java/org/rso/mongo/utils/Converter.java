@@ -22,7 +22,7 @@ public class Converter {
                 .fieldOfStudy(graduateDto.getFieldOfStudy())
                 .build();
 
-    public static Function<UniversityDto,University> universityDtoToEntity = universityDto ->
+    public static Function<UniversityDto, University> universityDtoToEntity = universityDto ->
             University.builder()
                     .name(universityDto.getName())
                     .location(universityDto.getLocation())
@@ -31,11 +31,11 @@ public class Converter {
                     .graduates(new ArrayList<>())
                     .build();
 
-    public static Function<University,UniversityDto> universityMongoToDto = university ->
+    public static Function<University, UniversityDto> universityEntityToDto = entity ->
             UniversityDto.builder()
-                    .name(university.getName())
-                    .yerOfFundation(university.getYearOfFundation())
-                    .location(university.getLocation())
-                    .universityType(university.getUniversityType())
+                    .name(entity.getName())
+                    .yerOfFundation(entity.getYearOfFundation())
+                    .location(entity.getLocation())
+                    .universityType(entity.getUniversityType())
                     .build();
 }

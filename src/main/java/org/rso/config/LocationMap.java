@@ -1,6 +1,8 @@
 package org.rso.config;
 
 
+import com.google.common.collect.ImmutableMap;
+import lombok.Getter;
 import org.rso.utils.AppProperty;
 import org.rso.utils.Location;
 import org.rso.utils.NodeInfo;
@@ -13,6 +15,7 @@ public class LocationMap {
     private final AppProperty appProperty = AppProperty.getInstance();
 
     private Map<Location,List<NodeInfo>> locationMap = new HashMap<>();
+
     public void add(Location location, NodeInfo nodeInfo){
         if(locationMap.containsKey(location)){
             List<NodeInfo> nodeInfos = locationMap.get(location);
@@ -39,5 +42,9 @@ public class LocationMap {
 
     public boolean hasDataByLocation(Location location){
         return getNodesByLocation(location).contains(appProperty.getSelfNode());
+    }
+
+    public Map<Location, List<NodeInfo>> getLocationMap() {
+        return ImmutableMap.copyOf(locationMap);
     }
 }

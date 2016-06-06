@@ -5,9 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/**
- * Created by Radosław on 24.05.2016.
- */
 
 @Data
 @AllArgsConstructor

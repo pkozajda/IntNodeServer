@@ -1,12 +1,19 @@
 package org.rso.controllers;
 
 import lombok.extern.java.Log;
+import org.rso.config.LocationMap;
 import org.rso.dto.DtoConverters;
 import org.rso.dto.NodeStatusDto;
 import org.rso.exceptions.NodeNotFoundException;
+import org.rso.mongo.repo.UniversityMongoRepository;
+import org.rso.mongo.repo.UniversityRepo;
+import org.rso.mongo.service.ReplicationService;
 import org.rso.service.NodeUtilService;
 import org.rso.utils.AppProperty;
 import org.rso.utils.NodeInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +34,12 @@ public class CoordinatorController {
 
     @Resource(name = "internalNodeUtilService")
     private NodeUtilService nodeUtilService;
+
+    @Resource
+    private ReplicationService replicationService;
+
+    @Value("${replication.redundancy}")
+    private int replicationReduntancy;
 
     private final AppProperty appProperty = AppProperty.getInstance();
 
@@ -66,6 +79,13 @@ public class CoordinatorController {
         // TODO: inform other nodes about network update
 
         // TODO: do not block for network updates (this can take a looong time)
+
+
+
+        // perform replication to a new node
+        replicationService.getTopLocations(replicationReduntancy)
+                .forEach(location -> replicationService.replicateLocation(location, createdNodeInfo));
+
 
         return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")

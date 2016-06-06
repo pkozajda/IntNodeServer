@@ -66,7 +66,7 @@ public class UniversityMongoRepository {
     public List<UniversityDto> getGraduatesByLocationInAllUniwersity(Location location) {
         List<UniversityDto> result = new ArrayList<>();
         for (University university : universityRepo.findByLocation(location)) {
-            UniversityDto universityDto = Converter.universityMongoToDto.apply(university);
+            UniversityDto universityDto = Converter.universityEntityToDto.apply(university);
             universityDto.setValue(university.getGraduates().size());
             result.add(universityDto);
         }
@@ -111,7 +111,7 @@ public class UniversityMongoRepository {
             for(ComeFrom comeFrom: map.keySet()){
                 comeFromDtos.add(new ComeFromDto(comeFrom,map.get(comeFrom)));
             }
-            res.add(new UniversityComeFromDto(Converter.universityMongoToDto.apply(university),comeFromDtos));
+            res.add(new UniversityComeFromDto(Converter.universityEntityToDto.apply(university),comeFromDtos));
         }
         return res;
     }
@@ -132,7 +132,7 @@ public class UniversityMongoRepository {
         List<UniversityDto> result = new ArrayList<>();
         for(University university: universityRepo.findByLocation(location)){
             long val = university.getGraduates().stream().filter(Graduate::isWorkedAtStudy).count();
-            UniversityDto universityDto = Converter.universityMongoToDto.apply(university);
+            UniversityDto universityDto = Converter.universityEntityToDto.apply(university);
             universityDto.setValue((int) val);
             result.add(universityDto);
         }
