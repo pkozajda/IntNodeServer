@@ -10,6 +10,7 @@ import org.rso.service.InternalNodeUtilService;
 import org.rso.service.NodeUtilService;
 import org.rso.service.NodesCfgService;
 import org.rso.utils.AppProperty;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -24,7 +25,8 @@ import org.springframework.util.StringUtils;
 @Log
 @EnableScheduling
 @SpringBootApplication
-public class IntNodeServerApplication {
+public class IntNodeServerApplication implements CommandLineRunner{
+
 
 	/* TODO:
           1. Refactor this bs!
@@ -90,6 +92,11 @@ public class IntNodeServerApplication {
 
 			/* TODO: cleanup context */
 		}
+	}
+
+	@Override
+	public void run(String... strings) throws Exception {
+
 	}
 
 	@Configuration
