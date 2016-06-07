@@ -8,6 +8,9 @@ import org.rso.entities.FieldOfStudy;
 import org.rso.utils.ComeFrom;
 import org.rso.utils.Location;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +20,6 @@ public class GraduateDto {
     private String surname;
     private ComeFrom comeFrom;
     private Location locationFrom;
-    private FieldOfStudy fieldOfStudy;
+    private List<FieldOfStudy> fieldOfStudies = new ArrayList<>();
     private UniversityDto universityDto;
 }

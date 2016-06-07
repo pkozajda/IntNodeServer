@@ -34,7 +34,7 @@ public class DtoConverters {
                     .surname(graduateDto.getSurname())
                     .comeFrom(graduateDto.getComeFrom())
                     .locationFrom(graduateDto.getLocationFrom())
-                    .fieldOfStudy(graduateDto.getFieldOfStudy())
+                    .fieldOfStudyList(graduateDto.getFieldOfStudies())
                     .build();
 
     public static Function<UniversityDto, University> universityDtoToEntity = universityDto ->

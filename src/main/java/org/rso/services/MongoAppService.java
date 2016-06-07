@@ -102,4 +102,18 @@ public class MongoAppService {
         }
         return universityRepository.getStatisticWorkingStudentsByFieldOfStudy(location);
     }
+
+    public LocationValueDto getGraduatesMoreThanOneFieldOfStudyByCountries(Location location) {
+        if(!isLocationExist(location)){
+            throw new LocationDoesNotExistException(String.format("location %s does not exist!!! ",location.toString()));
+        }
+        return universityRepository.getGraduatesMoreThanOneFieldOfStudyByCountries(location);
+    }
+
+    public List<UniversityDto> getGraduatesMoreThanOneFieldOfStudyByUniversities(Location location) {
+        if(!isLocationExist(location)){
+            throw new LocationDoesNotExistException(String.format("location %s does not exist!!! ",location.toString()));
+        }
+        return universityRepository.getGraduatesMoreThanOneFieldOfStudyByUniversities(location);
+    }
 }

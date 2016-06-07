@@ -2,9 +2,6 @@ package org.rso.services;
 
 import org.rso.dto.JobEntityDto;
 
-/**
- * Created by Radosław on 23.05.2016.
- */
 public interface JobService {
 
     void registerJob(JobEntityDto jobEntityDto);
@@ -28,4 +25,8 @@ public interface JobService {
     void getStatisticWorkingStudentsUniversities(JobEntityDto jobEntityDto);
 
     void getStatisticWorkingStudentsFieldOfStudy(JobEntityDto jobEntityDto);
+
+    void getGraduatesMoreThanOneFieldOfStudyCountries(JobEntityDto jobEntityDto);
+
+    void getGraduatesMoreThanOneFieldOfStudyUniversities(JobEntityDto jobEntityDto);
 }

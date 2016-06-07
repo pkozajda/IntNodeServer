@@ -59,7 +59,7 @@ public class DataBasePopulator {
                 .surname(randomSurname())
                 .comeFrom(randoComeFrom())
                 .locationFrom(randomLocation())
-                .fieldOfStudy(randomFieldOfStudy())
+                .fieldOfStudyList(randomFieldOfStudy())
                 .workedAtStudy(randomWorked())
                 .build();
     }
@@ -68,7 +68,7 @@ public class DataBasePopulator {
         return random.nextInt() % 15 == 0;
     }
 
-    private FieldOfStudy randomFieldOfStudy() {
+    private List<FieldOfStudy> randomFieldOfStudy() {
         List<FieldOfStudy> fieldOfStudies = Arrays.asList(
                 new FieldOfStudy("Informatyka"),
                 new FieldOfStudy("Chemia"),
@@ -84,7 +84,12 @@ public class DataBasePopulator {
                 new FieldOfStudy("Budownictwo"),
                 new FieldOfStudy("Religioznastwo")
         );
-        return fieldOfStudies.get(random.nextInt(fieldOfStudies.size()));
+        List<FieldOfStudy> res = new ArrayList<>();
+        res.add(fieldOfStudies.get(random.nextInt(fieldOfStudies.size())));
+        if(random.nextInt()%137==0){
+            res.add(fieldOfStudies.get(random.nextInt(fieldOfStudies.size())));
+        }
+        return res;
     }
 
     private Location randomLocation() {

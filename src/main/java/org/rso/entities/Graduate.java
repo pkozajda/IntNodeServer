@@ -4,6 +4,9 @@ import lombok.*;
 import org.rso.utils.ComeFrom;
 import org.rso.utils.Location;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,5 +18,5 @@ public class Graduate {
     private ComeFrom comeFrom;
     private Location locationFrom;
     private boolean workedAtStudy;
-    private FieldOfStudy fieldOfStudy;
+    private List<FieldOfStudy> fieldOfStudyList = new ArrayList<>();
 }
