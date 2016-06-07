@@ -6,9 +6,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 
-/**
- * Created by Radosław on 24.05.2016.
- */
 @Configuration
 public class MongoConfig extends AbstractMongoConfiguration {
     @Override

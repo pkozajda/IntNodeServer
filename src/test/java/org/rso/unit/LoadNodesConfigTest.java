@@ -3,7 +3,7 @@ package org.rso.unit;
 import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.rso.service.NodesCfgService;
+import org.rso.services.NodesCfgService;
 import org.rso.utils.NodeInfo;
 import org.rso.utils.NodeType;
 import org.springframework.boot.test.SpringApplicationConfiguration;

@@ -1,7 +1,7 @@
 package org.rso.config;
 
-import org.rso.service.JobService;
-import org.rso.service.JobServiceImpl;
+import org.rso.services.JobService;
+import org.rso.services.JobServiceImpl;
 import org.rso.tasks.JobTask;
 import org.rso.tasks.JobTaskExecutorService;
 import org.rso.utils.AppProperty;

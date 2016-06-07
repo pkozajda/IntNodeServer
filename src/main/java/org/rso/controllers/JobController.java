@@ -2,7 +2,7 @@ package org.rso.controllers;
 
 import lombok.extern.java.Log;
 import org.rso.dto.JobEntityDto;
-import org.rso.service.JobService;
+import org.rso.services.JobService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
