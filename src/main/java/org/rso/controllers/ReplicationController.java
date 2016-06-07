@@ -6,6 +6,7 @@ import org.rso.dto.DtoConverters;
 import org.rso.dto.UniversityDto;
 import org.rso.entities.University;
 import org.rso.repositories.UniversityRepo;
+import org.rso.repositories.UniversityRepository;
 import org.rso.utils.AppProperty;
 import org.rso.utils.Location;
 import org.springframework.http.ResponseEntity;

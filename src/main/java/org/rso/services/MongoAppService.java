@@ -2,6 +2,7 @@ package org.rso.services;
 
 import org.rso.dto.*;
 import org.rso.exceptions.LocationDoesNotExistException;
+import org.rso.repositories.UniversityRepository;
 import org.rso.utils.ComeFrom;
 import org.rso.utils.Location;
 import org.springframework.beans.factory.annotation.Autowired;
