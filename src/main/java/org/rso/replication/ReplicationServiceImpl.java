@@ -3,18 +3,14 @@ package org.rso.replication;
 import javaslang.control.Try;
 import lombok.NonNull;
 import lombok.extern.java.Log;
-import org.rso.configuration.LocationMap;
 import org.rso.dto.DtoConverters;
 import org.rso.dto.UniversityDto;
-import org.rso.network.dto.NetworkStatusDto;
 import org.rso.network.dto.NodeStatusDto;
-import org.rso.network.services.NodeNetworkService;
 import org.rso.repositories.UniversityRepo;
 import org.rso.utils.AppProperty;
 import org.rso.utils.Location;
 import org.rso.utils.NodeInfo;
 import org.rso.utils.NodeType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,9 +32,6 @@ public class ReplicationServiceImpl implements ReplicationService {
 
     @Resource
     private UniversityRepo universityRepo;
-
-    @Resource
-    private NodeNetworkService nodeNetworkService;
 
     @Value("${timeout.request.read}")
     private int readTimeout;
