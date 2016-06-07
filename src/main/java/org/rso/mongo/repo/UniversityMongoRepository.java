@@ -13,7 +13,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Radosław on 24.05.2016.
@@ -78,11 +77,7 @@ public class UniversityMongoRepository {
         List<FieldOfStudyDto> result = new ArrayList<>();
         Map<String, Long> map = new HashMap<>();
         for (University university : universityRepo.findByLocation(location)) {
-            university.getGraduates().stream().forEach(graduate -> {
-                        graduate.getFieldOfStudyList().stream().forEach(fieldOfStudy -> {
-                            addToMap(map, fieldOfStudy.getName());
-                        });
-                    }
+            university.getGraduates().stream().forEach(graduate -> addToMap(map, graduate.getFieldOfStudy().getName())
             );
         }
         return map;
@@ -109,14 +104,14 @@ public class UniversityMongoRepository {
             Map<ComeFrom, Long> map = new HashMap<>();
             university.getGraduates().forEach(p -> {
                         map.computeIfPresent(p.getComeFrom(), (k, v) -> v += 1);
-                        map.putIfAbsent(p.getComeFrom(), 1L);
+                        map.putIfAbsent(p.getComeFrom(),1L);
                     }
             );
             List<ComeFromDto> comeFromDtos = new ArrayList<>();
-            for (ComeFrom comeFrom : map.keySet()) {
-                comeFromDtos.add(new ComeFromDto(comeFrom, map.get(comeFrom)));
+            for(ComeFrom comeFrom: map.keySet()){
+                comeFromDtos.add(new ComeFromDto(comeFrom,map.get(comeFrom)));
             }
-            res.add(new UniversityComeFromDto(Converter.universityMongoToDto.apply(university), comeFromDtos));
+            res.add(new UniversityComeFromDto(Converter.universityMongoToDto.apply(university),comeFromDtos));
         }
         return res;
     }
@@ -127,15 +122,15 @@ public class UniversityMongoRepository {
 
     public LocationValueDto getStatisticWorkingStudentsByCountries(Location location) {
         long val = 0L;
-        for (University university : universityRepo.findByLocation(location)) {
-            val += university.getGraduates().stream().filter(Graduate::isWorkedAtStudy).count();
+        for(University university: universityRepo.findByLocation(location)){
+            val+=university.getGraduates().stream().filter(Graduate::isWorkedAtStudy).count();
         }
-        return new LocationValueDto(location, val);
+        return new LocationValueDto(location,val);
     }
 
     public List<UniversityDto> getStatisticWorkingStudentsByUniverities(Location location) {
         List<UniversityDto> result = new ArrayList<>();
-        for (University university : universityRepo.findByLocation(location)) {
+        for(University university: universityRepo.findByLocation(location)){
             long val = university.getGraduates().stream().filter(Graduate::isWorkedAtStudy).count();
             UniversityDto universityDto = Converter.universityMongoToDto.apply(university);
             universityDto.setValue((int) val);
@@ -146,52 +141,16 @@ public class UniversityMongoRepository {
 
     public List<FieldOfStudyDto> getStatisticWorkingStudentsByFieldOfStudy(Location location) {
         List<FieldOfStudyDto> result = new ArrayList<>();
-        Map<FieldOfStudy, Long> map = new HashMap<>();
-        for (University university : universityRepo.findByLocation(location)) {
-            university.getGraduates().stream().forEach(gr -> {
-                List<FieldOfStudy> fieldOfStudies = gr.getFieldOfStudyList();
-                fieldOfStudies.stream().forEach(fieldOfStudy -> {
-                    map.computeIfPresent(fieldOfStudy, (k, v) -> v += 1);
-                    map.putIfAbsent(fieldOfStudy, 1L);
-                });
+        Map<FieldOfStudy,Long> map = new HashMap<>();
+        for(University university: universityRepo.findByLocation(location)){
+            university.getGraduates().stream().forEach(gr->{
+                FieldOfStudy fieldOfStudy = gr.getFieldOfStudy();
+                map.computeIfPresent(fieldOfStudy,(k,v)->v+=1);
+                map.putIfAbsent(fieldOfStudy,1L);
             });
         }
-        for (FieldOfStudy fieldOfStudy : map.keySet()) {
-            result.add(new FieldOfStudyDto(fieldOfStudy.getName(), map.get(fieldOfStudy)));
-        }
-        return result;
-    }
-
-    public LocationValueDto getGraduatesMoreThanOneFieldOfStudyByCountries(Location location) {
-        AtomicInteger val = new AtomicInteger(0);
-        universityRepo.findByLocation(location).forEach(
-                university -> {
-                    university.getGraduates().stream().forEach(graduate -> {
-                        if (graduate.getFieldOfStudyList().size() > 1) {
-                            val.incrementAndGet();
-                        }
-                    });
-                }
-        );
-        return new LocationValueDto(location, val.get());
-    }
-
-    public List<UniversityDto> getGraduatesMoreThanOneFieldOfStudyByUniversities(Location location) {
-        Map<University,Integer> universityLongMap = new HashMap<>();
-        for (University university : universityRepo.findByLocation(location)) {
-            university.getGraduates().forEach(graduate -> {
-                if(graduate.getFieldOfStudyList().size()>0){
-                    universityLongMap.computeIfPresent(university,(k,v)->v+=1);
-                    universityLongMap.putIfAbsent(university,1);
-                }
-                    }
-            );
-        }
-        List<UniversityDto> result = new ArrayList<>();
-        for (University university: universityLongMap.keySet()){
-            UniversityDto universityDto = Converter.universityMongoToDto.apply(university);
-            universityDto.setValue(universityLongMap.get(university));
-            result.add(universityDto);
+        for(FieldOfStudy fieldOfStudy: map.keySet()){
+            result.add(new FieldOfStudyDto(fieldOfStudy.getName(),map.get(fieldOfStudy)));
         }
         return result;
     }

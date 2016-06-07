@@ -19,7 +19,7 @@ public class Converter {
                 .surname(graduateDto.getSurname())
                 .comeFrom(graduateDto.getComeFrom())
                 .locationFrom(graduateDto.getLocationFrom())
-                .fieldOfStudyList(graduateDto.getFieldOfStudies())
+                .fieldOfStudy(graduateDto.getFieldOfStudy())
                 .build();
 
     public static Function<UniversityDto,University> universityDtoTOUniversity = universityDto ->
