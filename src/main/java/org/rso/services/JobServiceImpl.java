@@ -24,9 +24,7 @@ import javax.annotation.Resource;
 import java.lang.reflect.Type;
 import java.util.*;
 
-/**
- * Created by Radosław on 23.05.2016.
- */
+
 @Service
 @Transactional
 @Log

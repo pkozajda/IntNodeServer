@@ -21,7 +21,7 @@ public class AppCtrl {
 
     @RequestMapping(value = "/graduatesByLocation/{location}")
     public ResponseEntity getGraduatesByLocation(@PathVariable Location location){
-        log.info("location "+ location);
+//        log.info("location "+ location);
         return new ResponseEntity(mongoAppService.getGraduatesByLocation(location), HttpStatus.OK);
     }
 
