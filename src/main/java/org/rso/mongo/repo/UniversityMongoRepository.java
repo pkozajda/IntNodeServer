@@ -167,12 +167,32 @@ public class UniversityMongoRepository {
         universityRepo.findByLocation(location).forEach(
                 university -> {
                     university.getGraduates().stream().forEach(graduate -> {
-                        if(graduate.getFieldOfStudyList().size()>1){
+                        if (graduate.getFieldOfStudyList().size() > 1) {
                             val.incrementAndGet();
                         }
                     });
                 }
         );
-        return new LocationValueDto(location,val.get());
+        return new LocationValueDto(location, val.get());
+    }
+
+    public List<UniversityDto> getGraduatesMoreThanOneFieldOfStudyByUniversities(Location location) {
+        Map<University,Integer> universityLongMap = new HashMap<>();
+        for (University university : universityRepo.findByLocation(location)) {
+            university.getGraduates().forEach(graduate -> {
+                if(graduate.getFieldOfStudyList().size()>0){
+                    universityLongMap.computeIfPresent(university,(k,v)->v+=1);
+                    universityLongMap.putIfAbsent(university,1);
+                }
+                    }
+            );
+        }
+        List<UniversityDto> result = new ArrayList<>();
+        for (University university: universityLongMap.keySet()){
+            UniversityDto universityDto = Converter.universityMongoToDto.apply(university);
+            universityDto.setValue(universityLongMap.get(university));
+            result.add(universityDto);
+        }
+        return result;
     }
 }

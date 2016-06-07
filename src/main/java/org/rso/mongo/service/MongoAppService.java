@@ -113,4 +113,11 @@ public class MongoAppService {
         }
         return universityMongoRepository.getGraduatesMoreThanOneFieldOfStudyByCountries(location);
     }
+
+    public List<UniversityDto> getGraduatesMoreThanOneFieldOfStudyByUniversities(Location location) {
+        if(!isLocationExist(location)){
+            throw new LocationDoesNotExist(String.format("location %s does not exist!!! ",location.toString()));
+        }
+        return universityMongoRepository.getGraduatesMoreThanOneFieldOfStudyByUniversities(location);
+    }
 }

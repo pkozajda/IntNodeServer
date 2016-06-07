@@ -32,4 +32,6 @@ public interface JobService {
     void getGraduatesMoreThanOneFieldOfStudyCountries(JobEntityDto jobEntityDto);
 
     void getGraduatesMoreThanOneFieldOfStudyUniversities(JobEntityDto jobEntityDto);
+
+
 }

@@ -71,4 +71,9 @@ public class AppCtrl {
     public ResponseEntity getGraduatesMoreThanOneFieldOfStudyByCountries(@PathVariable Location location){
         return ResponseEntity.ok(mongoAppService.getGraduatesMoreThanOneFieldOfStudyByCountries(location));
     }
+
+    @RequestMapping(value = "/getGraduatesMoreThanOneFieldOfStudyByUniversities/{location}")
+    public ResponseEntity getGraduatesMoreThanOneFieldOfStudyByUniversities(@PathVariable Location location){
+        return ResponseEntity.ok(mongoAppService.getGraduatesMoreThanOneFieldOfStudyByUniversities(location));
+    }
 }

@@ -62,7 +62,7 @@ public class JobServiceImpl implements JobService {
     private static final String GRADUATES_WORKING_BY_UNIVERSITIES = "http://{ip}:{port}/int/getStatisticWorkingStudents/universities/{location}";
     private static final String GRADUATES_WORKING_BY_FIELD_OF_STUDY = "http://{ip}:{port}/int/getStatisticWorkingStudents/fieldOfStudy/{location}";
     private static final String GRADUATES_MORE_THAN_ONE_FIELD_OF_STUDY_COUNTRIES = "http://{ip}:{port}/int/getGraduatesMoreThanOneFieldOfStudyByCountries/{location}";
-//    private static final String GRADUATES_MORE_THAN_ONE_FIELD_OF_STUDY_UNIVERSITIES = "http://{ip}:{port}/int/getGraduatesMoreThanOneFieldOfStudyByCountries/{location}";
+    private static final String GRADUATES_MORE_THAN_ONE_FIELD_OF_STUDY_UNIVERSITIES = "http://{ip}:{port}/int/getGraduatesMoreThanOneFieldOfStudyByUniversities/{location}";
     private static final int BASE_PORT = 8080;
 
 
@@ -257,7 +257,9 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void getGraduatesMoreThanOneFieldOfStudyUniversities(JobEntityDto jobEntityDto) {
-
+        List<UniversityDto> result = new ArrayList<>();
+        getFromUniversityDto(result,GRADUATES_MORE_THAN_ONE_FIELD_OF_STUDY_UNIVERSITIES);
+        sendResponse(jobEntityDto,result);
     }
 
     @Override
