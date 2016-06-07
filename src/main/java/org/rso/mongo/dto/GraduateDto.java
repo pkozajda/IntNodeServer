@@ -9,6 +9,9 @@ import org.rso.mongo.entities.FieldOfStudy;
 import org.rso.utils.ComeFrom;
 import org.rso.utils.Location;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Radosław on 24.05.2016.
  */
@@ -21,6 +24,6 @@ public class GraduateDto {
     private String surname;
     private ComeFrom comeFrom;
     private Location locationFrom;
-    private FieldOfStudy fieldOfStudy;
+    private List<FieldOfStudy> fieldOfStudies = new ArrayList<>();
     private UniversityDto universityDto;
 }
