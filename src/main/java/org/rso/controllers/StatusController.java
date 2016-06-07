@@ -1,5 +1,7 @@
 package org.rso.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.java.Log;
 import org.rso.dto.DtoConverters;
 import org.rso.dto.NetworkStatusDto;
@@ -15,10 +17,12 @@ import static java.util.stream.Collectors.toList;
 @Log
 @RestController
 @RequestMapping("utils")
+@Api(value = "/utils", description = "Endpoint for managing current network configuration")
 public class StatusController {
     private final AppProperty appProperty = AppProperty.getInstance();
 
     @RequestMapping(value = "/status")
+    @ApiOperation(httpMethod = "GET", value = "Retrieve current network configuration", response = NetworkStatusDto.class)
     public NetworkStatusDto getNetworkStatus() {
         return NetworkStatusDto.builder()
                 .coordinator(DtoConverters.nodeInfoToNodeStatusDto.apply(appProperty.getCoordinatorNode()))
