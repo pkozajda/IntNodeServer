@@ -28,4 +28,8 @@ public interface JobService {
     void getStatisticWorkingStudentsUniversities(JobEntityDto jobEntityDto);
 
     void getStatisticWorkingStudentsFieldOfStudy(JobEntityDto jobEntityDto);
+
+    void getGraduatesMoreThanOneFieldOfStudyCountries(JobEntityDto jobEntityDto);
+
+    void getGraduatesMoreThanOneFieldOfStudyUniversities(JobEntityDto jobEntityDto);
 }

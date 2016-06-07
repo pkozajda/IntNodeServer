@@ -9,7 +9,6 @@ import org.rso.utils.Location;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.MultiValueMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,5 +105,12 @@ public class MongoAppService {
             throw new LocationDoesNotExist(String.format("location %s does not exist!!! ",location.toString()));
         }
         return universityMongoRepository.getStatisticWorkingStudentsByFieldOfStudy(location);
+    }
+
+    public LocationValueDto getGraduatesMoreThanOneFieldOfStudyByCountries(Location location) {
+        if(!isLocationExist(location)){
+            throw new LocationDoesNotExist(String.format("location %s does not exist!!! ",location.toString()));
+        }
+        return universityMongoRepository.getGraduatesMoreThanOneFieldOfStudyByCountries(location);
     }
 }
