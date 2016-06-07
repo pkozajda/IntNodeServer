@@ -61,6 +61,8 @@ public class JobServiceImpl implements JobService {
     private static final String GRADUATES_WORKING_BY_COUNTRIES = "http://{ip}:{port}/int/getStatisticWorkingStudents/countries/{location}";
     private static final String GRADUATES_WORKING_BY_UNIVERSITIES = "http://{ip}:{port}/int/getStatisticWorkingStudents/universities/{location}";
     private static final String GRADUATES_WORKING_BY_FIELD_OF_STUDY = "http://{ip}:{port}/int/getStatisticWorkingStudents/fieldOfStudy/{location}";
+    private static final String GRADUATES_MORE_THAN_ONE_FIELD_OF_STUDY_COUNTRIES = "http://{ip}:{port}/int/getGraduatesMoreThanOneFieldOfStudyByCountries/{location}";
+    private static final String GRADUATES_MORE_THAN_ONE_FIELD_OF_STUDY_UNIVERSITIES = "http://{ip}:{port}/int/getGraduatesMoreThanOneFieldOfStudyByUniversities/{location}";
     private static final int BASE_PORT = 8080;
 
 
@@ -102,7 +104,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public void getGraduatesFromAllUniversities(JobEntityDto jobEntityDto) {
         List<UniversityDto> result = new ArrayList<>();
-        getFromUniversityDto(result,GRADUATES_BY_ORGIN_BY_COUNTRIES);
+        getFromUniversityDto(result,GRADUATE_BY_UNIVERSITIES);
         sendResponse(jobEntityDto, result);
     }
 
@@ -231,6 +233,33 @@ public class JobServiceImpl implements JobService {
     @Override
     public void getStatisticWorkingStudentsFieldOfStudy(JobEntityDto jobEntityDto) {
         fieldOfStudyDtoJob(jobEntityDto,GRADUATES_WORKING_BY_FIELD_OF_STUDY);
+    }
+
+    @Override
+    public void getGraduatesMoreThanOneFieldOfStudyCountries(JobEntityDto jobEntityDto) {
+        List<LocationValueDto> result = new ArrayList<>();
+        for (Location location: avaiableLocation()){
+            final String ipAddress = getResourceNodeIp(location);
+            ResponseEntity<LocationValueDto> responseEntity = restTemplate.exchange(
+                    GRADUATES_MORE_THAN_ONE_FIELD_OF_STUDY_COUNTRIES,
+                    HttpMethod.GET,
+                    null,
+                    LocationValueDto.class,
+                    ipAddress,
+                    BASE_PORT,
+                    location
+            );
+            result.add(responseEntity.getBody());
+//            TODO retransmit
+        }
+        sendResponse(jobEntityDto,result);
+    }
+
+    @Override
+    public void getGraduatesMoreThanOneFieldOfStudyUniversities(JobEntityDto jobEntityDto) {
+        List<UniversityDto> result = new ArrayList<>();
+        getFromUniversityDto(result,GRADUATES_MORE_THAN_ONE_FIELD_OF_STUDY_UNIVERSITIES);
+        sendResponse(jobEntityDto,result);
     }
 
     @Override
