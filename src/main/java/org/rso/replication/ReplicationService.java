@@ -11,4 +11,5 @@ import java.util.List;
 public interface ReplicationService {
     List<Location> getTopLocations(final int topLocations);
     Try<Void> replicateLocation(@NonNull final Location location, @NonNull final NodeInfo nodeInfo);
+    Try<Void> replicateLocation(@NonNull final Location location, @NonNull final NodeInfo sourceNode, @NonNull final NodeInfo destNode);
 }

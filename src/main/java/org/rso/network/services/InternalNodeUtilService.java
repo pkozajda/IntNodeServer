@@ -1,6 +1,7 @@
 package org.rso.network.services;
 
 import javaslang.control.Try;
+import lombok.NonNull;
 import lombok.extern.java.Log;
 import org.rso.dto.DtoConverters;
 import org.rso.network.dto.NetworkStatusDto;
@@ -21,6 +22,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -53,6 +55,9 @@ public class InternalNodeUtilService implements NodeUtilService {
     @Value("${timeout.request.connect}")
     private int connectionTimeout;
 
+    @Value("${replication.redundancy}")
+    private int replicationRedundancy;
+
     @Resource
     private NodeNetworkService nodeNetworkService;
 
@@ -60,7 +65,6 @@ public class InternalNodeUtilService implements NodeUtilService {
     private ReplicationService replicationService;
 
     private static final String DEFAULT_NODES_PORT = "8080";
-    private static final String HEARTBEAT_URL = "http://{ip}:{port}/utils/heartbeat";
     private static final String ELECTION_URL = "http://{ip}:{port}/utils/election";
     private static final String COORDINATOR_URL = "http://{ip}:{port}/utils/coordinator";
     private static final String STATUS_URL = "http://{ip}:{port}/utils/status";
@@ -99,39 +103,117 @@ public class InternalNodeUtilService implements NodeUtilService {
                                         coordinatorTag, heartbeatTag, nodeInfo.getNodeIPAddress())
                         );
 
-                        // TODO nie ma wezla wiec trzeba go:
-                        // 1. usunac z listy wezlow (+)
-                        // 2. rozeslac ze go nie ma (+)
-                        // 3. zreplikowac dane
+                        /* Node is not responding. We need to: */
+
+                        /* 1. remove it from a list of available nodes */
                         appProperty.removeUnAvaiableNode(nodeInfo.getNodeId());
+
+                        /* 2. Replicate data placed on that node */
+                        final List<Location> locationsStoredOnNode = nodeInfo.getLocations();
+
+                        if(locationsStoredOnNode.isEmpty()) {
+                            log.info(
+                                    String.format("%s %s: Node %s did not store any data! There is no need for any replication!",
+                                            coordinatorTag, heartbeatTag, nodeInfo.getNodeIPAddress())
+                            );
+                        } else {
+                            log.info(
+                                    String.format("%s %s: Node %s stored the following data: %s. The need for data replication is real :(",
+                                            coordinatorTag, heartbeatTag, nodeInfo.getNodeIPAddress(), nodeInfo.getLocations())
+                            );
+
+
+                            final NetworkStatus currentNetworkStatus = appProperty.getNetworkStatus();
+
+                            if(currentNetworkStatus.getNodes().isEmpty()) {
+                                log.info(
+                                        String.format("%s %s: Network does not contain any nodes. Aborting replication...", coordinatorTag, heartbeatTag)
+                                );
+                            } else {
+                                replicateLocations(nodeInfo.getLocations());
+                            }
+
+
+                        }
+
+
+                        /* 3. Inform all the remaining nodes about changes in network */
+                        final NetworkStatusDto updatedNetworkStatusDto = NetworkStatusDto.builder()
+                                .coordinator(DtoConverters.nodeInfoToNodeStatusDto.apply(appProperty.getCoordinatorNode()))
+                                .nodes(appProperty.getAvailableNodes().stream().map(DtoConverters.nodeInfoToNodeStatusDto).collect(toList()))
+                                .build();
+
+                        appProperty.getAvailableNodes().forEach(availableNodeInfo ->
+                                nodeNetworkService.setNetworkStatus(availableNodeInfo, updatedNetworkStatusDto)
+                                        .onFailure(ez ->
+                                                /* A node suddenly stopped responding; we don't need to do anything here though
+                                                   since it will be removed during the next Heartbeat check iteration anyway.
+                                                 */
+                                                log.info(String.format("%s %s: Node %s stopped responding during network status update. It should be removed in the next Heartbeat check",
+                                                        coordinatorTag, heartbeatTag, availableNodeInfo.getNodeIPAddress()))
+                                        )
+                        );
+
+
                     })
         );
-
-
-        //replicate data
-
-
-        /* TODO:
-                Do not send any updates if nothing changed!
-         */
-        /* Inform all the remaining nodes about changes in network */
-        final NetworkStatusDto updatedNetworkStatusDto = NetworkStatusDto.builder()
-                .coordinator(DtoConverters.nodeInfoToNodeStatusDto.apply(appProperty.getCoordinatorNode()))
-                .nodes(appProperty.getAvailableNodes().stream().map(DtoConverters.nodeInfoToNodeStatusDto).collect(toList()))
-                .build();
-
-        /* TODO: parallel calls to nodes */
-        appProperty.getAvailableNodes().forEach(nodeInfo ->
-                nodeNetworkService.setNetworkStatus(nodeInfo, updatedNetworkStatusDto)
-                        .onFailure(e ->
-                            /* A node suddenly stopped responding; we don't need to do anything here though
-                               since it will be removed during the next Heartbeat check iteration anyway.
-                             */
-                            log.info(String.format("%s %s: Node %s stopped responding during network status update. It should be removed in the next Heartbeat check",
-                                coordinatorTag, heartbeatTag, nodeInfo.getNodeIPAddress()))
-                        )
-        );
     }
+
+    // replication algorithm
+    private Try<Void> replicateLocations(@NonNull final List<Location> locations) {
+
+        final Map<Location, List<NodeInfo>> replicationMap = appProperty.getReplicationMap();
+
+        locations.forEach(locationToReplicate -> {
+            final List<NodeInfo> nodesWithLocation = Optional.ofNullable(replicationMap.get(locationToReplicate))
+                        .orElseThrow(() -> new RuntimeException("No node with location: " + locationToReplicate + " found"));
+
+            if(nodesWithLocation.size() >= replicationRedundancy) {
+                log.info(
+                        String.format("Location %s is already duplicated %d times. Skipping this one...",
+                                locationToReplicate, nodesWithLocation.size())
+                );
+            } else if(nodesWithLocation.size() == 0 || nodesWithLocation.isEmpty()){
+                log.warning(
+                        String.format("Location %s is not stored on any other node! It has been lost for eternity...",
+                                locationToReplicate)
+                );
+            } else {
+                // pick a random/first node with the location
+
+                final NodeInfo replicationSource = pickReplicationSource(nodesWithLocation);
+                final NodeInfo replicationDest = pickReplicationDest(locationToReplicate, replicationMap);
+
+                log.info(
+                        String.format("Performing replication of location: %s from source: %s to destination: %s",
+                                locationToReplicate, replicationSource.getNodeIPAddress(), replicationDest.getNodeIPAddress())
+                );
+
+                replicationService.replicateLocation(locationToReplicate, replicationSource, replicationDest)
+                        .onSuccess((e) -> log.info("Successfully replicated! :)"))
+                        .onFailure(Throwable::printStackTrace);
+
+            }
+        });
+
+
+        return Try.success(null);
+    }
+
+    private NodeInfo pickReplicationDest(Location locationToReplicate, Map<Location, List<NodeInfo>> replicationMap) {
+        return replicationMap.entrySet().stream()
+                .filter(locationListEntry -> !locationListEntry.getKey().equals(locationToReplicate))
+                .map(Map.Entry::getValue)
+                .findAny()
+                .orElseThrow(() -> new RuntimeException("Cannot return node for replication destination"))
+                .get(0);
+    }
+
+    // simplest algorithm of picking nodes...
+    private NodeInfo pickReplicationSource(@NonNull final List<NodeInfo> nodesWithLocation) {
+        return nodesWithLocation.get(0);
+    }
+
 
     /*
     * 1-pobrac wszystkie wezly o wiekszym identyfikatorze

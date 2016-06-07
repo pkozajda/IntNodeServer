@@ -4,8 +4,10 @@ import javaslang.control.Try;
 import lombok.extern.java.Log;
 import org.rso.configuration.LocationMap;
 import org.rso.dto.DtoConverters;
+import org.rso.network.dto.NetworkStatusDto;
 import org.rso.network.dto.NodeStatusDto;
 import org.rso.exceptions.NodeNotFoundException;
+import org.rso.network.services.NodeNetworkService;
 import org.rso.network.services.NodeUtilService;
 import org.rso.replication.ReplicationServiceImpl;
 import org.rso.utils.AppProperty;
@@ -20,23 +22,23 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Log
 @RestController
 @RequestMapping("coord")
 public class CoordinatorController {
 
-    @Resource(name = "internalNodeUtilService")
-    private NodeUtilService nodeUtilService;
+    @Resource
+    private NodeNetworkService nodeNetworkService;
 
     @Resource
     private ReplicationServiceImpl replicationServiceImpl;
-
-    @Resource
-    private LocationMap locationMap;
 
     @Value("${replication.redundancy}")
     private int replicationReduntancy;
@@ -92,11 +94,38 @@ public class CoordinatorController {
                                                 location, createdNodeInfo.getNodeId(), createdNodeInfo.getNodeIPAddress())
                                 );
 
-                                locationMap.addEntry(location, createdNodeInfo);
+                                // TODO: network update!
+
+                                if(createdNodeInfo.getLocations() == null) {
+                                    createdNodeInfo.setLocations(new ArrayList<>());
+                                }
+
+                                createdNodeInfo.getLocations().add(location);
+
+//                                locationMap.addEntry(location, createdNodeInfo);
                             })
                 );
 
-        createdNodeInfo.setLocations(locationMap.getLocationsForNode(createdNodeInfo));
+// TODO: network update!
+//        createdNodeInfo.setLocations(locationMap.getLocationsForNode(createdNodeInfo));
+
+        final NetworkStatusDto updatedNetworkStatusDto = NetworkStatusDto.builder()
+                .coordinator(DtoConverters.nodeInfoToNodeStatusDto.apply(appProperty.getCoordinatorNode()))
+                .nodes(appProperty.getAvailableNodes().stream().map(DtoConverters.nodeInfoToNodeStatusDto).collect(toList()))
+                .build();
+
+        appProperty.getAvailableNodes().forEach(availableNodeInfo ->
+                nodeNetworkService.setNetworkStatus(availableNodeInfo, updatedNetworkStatusDto)
+                        .onFailure(ez ->
+                                                /* A node suddenly stopped responding; we don't need to do anything here though
+                                                   since it will be removed during the next Heartbeat check iteration anyway.
+                                                 */
+                                log.info(String.format("Node %s stopped responding during network status update. It should be removed in the next Heartbeat check",
+                                        availableNodeInfo.getNodeIPAddress()))
+                        )
+        );
+
+
 
         // remmemeber to remove transfered locations from database info
 
