@@ -2,9 +2,9 @@ package org.rso.controllers;
 
 import lombok.extern.java.Log;
 import org.rso.dto.DtoConverters;
-import org.rso.dto.NodeStatusDto;
+import org.rso.network.dto.NodeStatusDto;
 import org.rso.exceptions.NodeNotFoundException;
-import org.rso.services.NodeUtilService;
+import org.rso.network.services.NodeUtilService;
 import org.rso.utils.AppProperty;
 import org.rso.utils.NodeInfo;
 import org.rso.utils.NodeType;

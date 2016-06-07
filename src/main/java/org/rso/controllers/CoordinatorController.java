@@ -4,10 +4,10 @@ import javaslang.control.Try;
 import lombok.extern.java.Log;
 import org.rso.configuration.LocationMap;
 import org.rso.dto.DtoConverters;
-import org.rso.dto.NodeStatusDto;
+import org.rso.network.dto.NodeStatusDto;
 import org.rso.exceptions.NodeNotFoundException;
-import org.rso.services.NodeUtilService;
-import org.rso.services.ReplicationService;
+import org.rso.network.services.NodeUtilService;
+import org.rso.replication.ReplicationServiceImpl;
 import org.rso.utils.AppProperty;
 import org.rso.utils.NodeInfo;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +33,7 @@ public class CoordinatorController {
     private NodeUtilService nodeUtilService;
 
     @Resource
-    private ReplicationService replicationService;
+    private ReplicationServiceImpl replicationServiceImpl;
 
     @Resource
     private LocationMap locationMap;
@@ -83,9 +83,9 @@ public class CoordinatorController {
 
 
         // perform replication on a new node
-        replicationService.getTopLocations(replicationReduntancy)
+        replicationServiceImpl.getTopLocations(replicationReduntancy)
                 .forEach(location ->
-                    Try.run(() -> replicationService.replicateLocation(location, createdNodeInfo))
+                    Try.run(() -> replicationServiceImpl.replicateLocation(location, createdNodeInfo))
                             .onSuccess(e -> {
                                 log.info(
                                         String.format("Successfully replicated data about location: %s on node: %d [%s]",

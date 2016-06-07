@@ -2,6 +2,7 @@ package org.rso.dto;
 
 import org.rso.entities.Graduate;
 import org.rso.entities.University;
+import org.rso.network.dto.NodeStatusDto;
 import org.rso.utils.NodeInfo;
 import org.rso.utils.NodeType;
 

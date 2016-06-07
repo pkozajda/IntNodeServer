@@ -1,10 +1,11 @@
-package org.rso.services;
+package org.rso.network.services;
 
 import javaslang.control.Try;
 import lombok.extern.java.Log;
 import org.rso.dto.DtoConverters;
-import org.rso.dto.NetworkStatusDto;
-import org.rso.dto.NodeStatusDto;
+import org.rso.network.dto.NetworkStatusDto;
+import org.rso.network.dto.NodeStatusDto;
+import org.rso.replication.ReplicationService;
 import org.rso.utils.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -17,6 +18,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +26,11 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
+/*
+    TODO:
+     1. Parallel calls to nodes
+     2. # of retries before a node is considered inactive and therefore removed
+ */
 @Log
 @Service("internalNodeUtilService")
 public class InternalNodeUtilService implements NodeUtilService {
@@ -46,8 +53,11 @@ public class InternalNodeUtilService implements NodeUtilService {
     @Value("${timeout.request.connect}")
     private int connectionTimeout;
 
-//    @Resource
-//    private NodeNetworkService nodeNetworkService;
+    @Resource
+    private NodeNetworkService nodeNetworkService;
+
+    @Resource
+    private ReplicationService replicationService;
 
     private static final String DEFAULT_NODES_PORT = "8080";
     private static final String HEARTBEAT_URL = "http://{ip}:{port}/utils/heartbeat";
@@ -55,9 +65,7 @@ public class InternalNodeUtilService implements NodeUtilService {
     private static final String COORDINATOR_URL = "http://{ip}:{port}/utils/coordinator";
     private static final String STATUS_URL = "http://{ip}:{port}/utils/status";
     private static final String NODES_URL = "http://{ip}:{port}/coord/nodes";
-    private static final String NODES_BY_ID_URL = NODES_URL + "/{nodeId}";
 
-    /* TODO: remove singleton */
     private final AppProperty appProperty = AppProperty.getInstance();
 
     private final RestTemplate restTemplate = new RestTemplate();
@@ -76,32 +84,32 @@ public class InternalNodeUtilService implements NodeUtilService {
 
         log.info(String.format("%s %s: Running heartbeat checks (%s nodes)", coordinatorTag, heartbeatTag, appProperty.getAvailableNodes().size()));
 
-        /*
-            TODO: Parallel calls to nodes
-         */
+        appProperty.getAvailableNodes().forEach(nodeInfo ->
+                nodeNetworkService.getHeartbeat(nodeInfo)
+                    .onSuccess(nodeStatusDto ->
+                        log.info(
+                                String.format("%s %s: Heartbeat check of %s received: %s",
+                                        coordinatorTag, heartbeatTag,
+                                        nodeInfo.getNodeIPAddress(), nodeStatusDto)
+                        )
+                    )
+                    .onFailure(e -> {
+                        log.info(
+                                String.format("%s %s: Node %s stopped responding",
+                                        coordinatorTag, heartbeatTag, nodeInfo.getNodeIPAddress())
+                        );
 
-        appProperty.getAvailableNodes().forEach(nodeInfo -> {
-            Try.run(() -> {
-                final NodeStatusDto internalNodeStatusDto = restTemplate.getForObject(
-                        HEARTBEAT_URL,
-                        NodeStatusDto.class,
-                        nodeInfo.getNodeIPAddress(),
-                        DEFAULT_NODES_PORT
-                );
-                log.info(String.format("%s %s: Heartbeat check of %s received: %s", coordinatorTag, heartbeatTag, nodeInfo.getNodeIPAddress(), internalNodeStatusDto));
-            }).onFailure(e -> {
+                        // TODO nie ma wezla wiec trzeba go:
+                        // 1. usunac z listy wezlow (+)
+                        // 2. rozeslac ze go nie ma (+)
+                        // 3. zreplikowac dane
+                        appProperty.removeUnAvaiableNode(nodeInfo.getNodeId());
+                    })
+        );
 
-                log.info(String.format("%s %s: Node %s stopped responding", coordinatorTag, heartbeatTag, nodeInfo.getNodeIPAddress()));
-                /* TODO: Numer of retries before node is removed ??? */
 
-                // TODO nie ma wezla wiec trzeba go:
-                // 1. usunac z listy wezlow (+)
-                // 2. rozeslac ze go nie ma (+)
-                // 3. zreplikowac dane
-                appProperty.removeUnAvaiableNode(nodeInfo.getNodeId());
+        //replicate data
 
-            });
-        });
 
         /* TODO:
                 Do not send any updates if nothing changed!
@@ -113,31 +121,16 @@ public class InternalNodeUtilService implements NodeUtilService {
                 .build();
 
         /* TODO: parallel calls to nodes */
-        appProperty.getAvailableNodes().forEach(nodeInfo -> {
-            Try.run(() -> {
-                final ResponseEntity<Void> networkStatusUpdateEntity = restTemplate.postForEntity(
-                        STATUS_URL,
-                        updatedNetworkStatusDto,
-                        Void.class,
-                        nodeInfo.getNodeIPAddress(),
-                        DEFAULT_NODES_PORT
-                );
-
-                if(networkStatusUpdateEntity.getStatusCode() != HttpStatus.NO_CONTENT) {
-                    /* TODO: This might create some integrity issues. Consider what to do here... */
-                    throw new RuntimeException("Unable to update network status in node: " + nodeInfo.getNodeId());
-                }
-
-            }).onFailure(e -> {
-                /* A node suddenly stopped responding; we don't need to do anything here though
-                   since it will be removed during the next Heartbeat check iteration anyway.
-                 */
-                log.info(String.format("%s %s: Node %s stopped responding during network status update. It should be removed in the next Heartbeat check",
-                        coordinatorTag, heartbeatTag, nodeInfo.getNodeIPAddress()));
-            });
-        });
-
-
+        appProperty.getAvailableNodes().forEach(nodeInfo ->
+                nodeNetworkService.setNetworkStatus(nodeInfo, updatedNetworkStatusDto)
+                        .onFailure(e ->
+                            /* A node suddenly stopped responding; we don't need to do anything here though
+                               since it will be removed during the next Heartbeat check iteration anyway.
+                             */
+                            log.info(String.format("%s %s: Node %s stopped responding during network status update. It should be removed in the next Heartbeat check",
+                                coordinatorTag, heartbeatTag, nodeInfo.getNodeIPAddress()))
+                        )
+        );
     }
 
     /*

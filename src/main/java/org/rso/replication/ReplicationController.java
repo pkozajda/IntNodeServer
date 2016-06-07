@@ -1,4 +1,4 @@
-package org.rso.controllers;
+package org.rso.replication;
 
 import lombok.NonNull;
 import lombok.extern.java.Log;

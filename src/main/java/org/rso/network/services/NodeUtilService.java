@@ -1,4 +1,4 @@
-package org.rso.services;
+package org.rso.network.services;
 
 
 public interface NodeUtilService {

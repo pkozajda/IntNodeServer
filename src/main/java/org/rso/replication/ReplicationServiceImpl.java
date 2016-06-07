@@ -1,4 +1,4 @@
-package org.rso.services;
+package org.rso.replication;
 
 import javaslang.control.Try;
 import lombok.NonNull;
@@ -28,7 +28,7 @@ import static java.util.stream.Collectors.toList;
 
 @Log
 @Service
-public class ReplicationService {
+public class ReplicationServiceImpl implements ReplicationService {
 
     @Resource
     private UniversityRepo universityRepo;
@@ -54,24 +54,26 @@ public class ReplicationService {
     }
 
     // remember to remove assigned nodes from list
-    public List<Location> getTopLocations(final int top) {
+    @Override
+    public List<Location> getTopLocations(final int topLocations) {
 
         final int locationEntriesNumber = locationMap.getLocationMap().size();
 
-        if(top < 1 || top > locationMap.getLocationMap().size()) {
+        if(topLocations < 1 || topLocations > locationMap.getLocationMap().size()) {
             throw new RuntimeException(
-                    String.format("Cannot retrieve %d top locations from location map of %d entries", top, locationEntriesNumber)
+                    String.format("Cannot retrieve %d topLocations locations from location map of %d entries", topLocations, locationEntriesNumber)
             );
         }
 
         return locationMap.getLocationMap().entrySet().stream()
                 .sorted((es1, es2) -> -Integer.compare(es1.getValue().size(), es2.getValue().size()))
-                .limit(top)
+                .limit(topLocations)
                 .map(Map.Entry::getKey)
                 .collect(toList());
     }
 
 
+    @Override
     public Try<Void> replicateLocation(@NonNull final Location location, @NonNull final NodeInfo nodeInfo) {
 
         log.info(String.format("Replicating %s on node: %d[%s]", location, nodeInfo.getNodeId(), nodeInfo.getNodeIPAddress()));
