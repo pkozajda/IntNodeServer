@@ -1,4 +1,4 @@
-package org.rso.config;
+package org.rso.configuration;
 
 
 import com.google.common.collect.ImmutableMap;

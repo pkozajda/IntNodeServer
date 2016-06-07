@@ -1,4 +1,4 @@
-package org.rso.config;
+package org.rso.configuration;
 
 import com.github.fakemongo.Fongo;
 import com.mongodb.Mongo;

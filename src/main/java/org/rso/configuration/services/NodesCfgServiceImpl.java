@@ -1,14 +1,12 @@
-package org.rso.services;
+package org.rso.configuration.services;
 
 import com.google.common.collect.ImmutableList;
 import lombok.Setter;
+import org.rso.utils.Location;
 import org.rso.utils.NodeInfo;
 import org.rso.utils.NodeType;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.function.Predicate;
 
 import static java.util.stream.Collectors.toList;
@@ -61,6 +59,7 @@ public class NodesCfgServiceImpl implements NodesCfgService {
                         .nodeId(Integer.parseInt(properties.getProperty(propertyValueOf(NodeInfo.NODE_ID, i))))
                         .nodeIPAddress(properties.getProperty(propertyValueOf(NodeInfo.NODE_ADDRESS, i)))
                         .nodeType(NodeType.INTERNAL_COORDINATOR)
+                        .locations(Arrays.asList(Location.values())) // initial coordinator has all data on stratup
                         .build();
 
                 nodes.put(coordinatorNode.getNodeId(), coordinatorNode);

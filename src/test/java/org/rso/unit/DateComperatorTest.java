@@ -1,10 +1,8 @@
 package org.rso.unit;
 
 import jdk.nashorn.internal.ir.annotations.Ignore;
-import lombok.Data;
 import org.junit.Assert;
-import org.junit.Test;
-import org.rso.utils.DateComperator;
+import org.rso.utils.DateComparator;
 
 import java.util.Date;
 
@@ -16,7 +14,7 @@ public class DateComperatorTest {
         Date a = new Date();
         Thread.sleep(time);
         Date b = new Date();
-        long dif = DateComperator.compareDate(a,b);
+        long dif = DateComparator.compareDate(a,b);
         Assert.assertEquals(time,dif);
     }
 }

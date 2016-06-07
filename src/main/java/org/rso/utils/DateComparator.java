@@ -2,7 +2,7 @@ package org.rso.utils;
 
 import java.util.Date;
 
-public class DateComperator {
+public class DateComparator {
 
     public static long compareDate(Date a, Date b){
         long time =0L;

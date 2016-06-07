@@ -1,4 +1,4 @@
-package org.rso.services;
+package org.rso.configuration.services;
 
 import org.rso.utils.NodeInfo;
 

@@ -4,7 +4,7 @@ package org.rso.unit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.rso.IntNodeServerApplication;
-import org.rso.config.LocationMap;
+import org.rso.configuration.LocationMap;
 import org.rso.utils.Location;
 import org.rso.utils.NodeInfo;
 import org.rso.utils.NodeType;

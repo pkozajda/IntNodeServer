@@ -2,12 +2,12 @@ package org.rso.controllers;
 
 import javaslang.control.Try;
 import lombok.extern.java.Log;
-import org.rso.config.LocationMap;
+import org.rso.configuration.LocationMap;
 import org.rso.dto.DtoConverters;
 import org.rso.dto.NodeStatusDto;
 import org.rso.exceptions.NodeNotFoundException;
-import org.rso.services.ReplicationService;
 import org.rso.services.NodeUtilService;
+import org.rso.services.ReplicationService;
 import org.rso.utils.AppProperty;
 import org.rso.utils.NodeInfo;
 import org.springframework.beans.factory.annotation.Value;

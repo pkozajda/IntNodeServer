@@ -259,7 +259,7 @@ public class InternalNodeUtilService implements NodeUtilService {
 //        log.info("koordynator obecny byl ostatnio " + DataTimeLogger.logTime(lastPresence));
         log.info(String.format("Coordinator (id = %s, IP = %s) last seen: %s",
                 currentCoordinator.getNodeId(), currentCoordinator.getNodeIPAddress(), DataTimeLogger.logTime(lastPresence)));
-        long dif = DateComperator.compareDate(lastPresence,new Date());
+        long dif = DateComparator.compareDate(lastPresence,new Date());
 
         if(dif > electionDelay){
             doElection();

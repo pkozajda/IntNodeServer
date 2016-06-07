@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * Created by Radosław on 23.05.2016.
- */
+
 @Log
 @RestController
 @RequestMapping(value = "/job")

@@ -1,4 +1,4 @@
-package org.rso.config;
+package org.rso.configuration;
 
 import org.rso.services.JobService;
 import org.rso.services.JobServiceImpl;

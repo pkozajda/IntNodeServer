@@ -1,9 +1,10 @@
 package org.rso.services;
 
 
-import org.rso.utils.NetworkStatus;
+import javaslang.control.Try;
+import org.rso.dto.NetworkStatusDto;
 import org.rso.utils.NodeInfo;
 
 public interface NodeNetworkService {
-    NetworkStatus getNetworkStatusFromNode(final NodeInfo node);
+    Try<NetworkStatusDto> getNetworkStatus(final NodeInfo node);
 }

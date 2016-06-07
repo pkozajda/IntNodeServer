@@ -3,7 +3,7 @@ package org.rso.services;
 import javaslang.control.Try;
 import lombok.NonNull;
 import lombok.extern.java.Log;
-import org.rso.config.LocationMap;
+import org.rso.configuration.LocationMap;
 import org.rso.dto.DtoConverters;
 import org.rso.dto.UniversityDto;
 import org.rso.repositories.UniversityRepo;

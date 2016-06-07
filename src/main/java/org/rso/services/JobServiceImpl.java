@@ -1,14 +1,14 @@
 package org.rso.services;
 
 import lombok.extern.java.Log;
-import org.rso.config.LocationMap;
+import org.rso.configuration.LocationMap;
 import org.rso.dto.*;
 import org.rso.entities.FieldOfStudy;
 import org.rso.entities.responseObject.LocationMapResponse;
+import org.rso.utils.AppProperty;
 import org.rso.utils.ComeFrom;
 import org.rso.utils.JobQueue;
 import org.rso.utils.Location;
-import org.rso.utils.NodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -38,6 +39,11 @@ public class JobServiceImpl implements JobService {
 
     @Autowired
     private LocationMap locationMap;
+
+    @Resource
+    private NodeNetworkService nodeNetworkService;
+
+    private final AppProperty appProperty = AppProperty.getInstance();
 
     private final Random random = new Random();
 
@@ -276,10 +282,34 @@ public class JobServiceImpl implements JobService {
         }
     }
 
+    // TODO: alternative path if coordinator is not present
     private String getResourceNodeIp(Location location) {
-        List<NodeInfo> nodeInfos = locationMap.getNodesByLocation(location);
-        int randomNumber = random.nextInt(nodeInfos.size());
-        return nodeInfos.get(randomNumber).getNodeIPAddress();
+
+        final NetworkStatusDto networkStatusDto = nodeNetworkService.getNetworkStatus(appProperty.getCoordinatorNode())
+                .getOrElseThrow(throwable -> new RuntimeException(throwable));
+
+        final NodeStatusDto coordinatorNodeStatusDto = Optional.ofNullable(networkStatusDto.getCoordinator())
+                .orElseThrow(() -> new RuntimeException("Network does not currently have any coordinator!"));
+
+        // check coordinator in the first order
+        if(coordinatorNodeStatusDto.getLocations().contains(location)) {
+            return coordinatorNodeStatusDto.getNodeIPAddress();
+        }
+
+        final NodeStatusDto resourceNodeStatus = Optional.ofNullable(networkStatusDto.getNodes())
+                .orElse(Collections.emptyList()).stream()
+                .filter(nodeInfo -> nodeInfo.getLocations().contains(location))
+                .findAny()
+                .orElseThrow(() -> new RuntimeException(String.format("No nodes containing location: %s found", location)));
+
+        log.info(
+                String.format("Using node %d [%s] as a resource for location: %s",
+                        resourceNodeStatus.getNodeId(),
+                        resourceNodeStatus.getNodeIPAddress(),
+                        location)
+        );
+
+        return resourceNodeStatus.getNodeIPAddress();
     }
 
     private List<Location> avaiableLocation() {
