@@ -10,6 +10,7 @@ import org.rso.utils.ComeFrom;
 import org.rso.utils.Location;
 import org.rso.utils.UniversityType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -27,14 +28,22 @@ public class DataBasePopulator {
     @Autowired
     private UniversityMongoRepository universityRepository;
 
+    @Value("${populate.on_startup}")
+    private boolean populateOnStartup;
+
     private final Random random = new Random();
 
     private static final Predicate<Location> locationPredicate = location -> location != Location.LAND;
 
+
+
     @PostConstruct
     public void init() {
         universityRepository.clear();
-        populateDB();
+
+        if(populateOnStartup) {
+            populateDB();
+        }
     }
 
     private void populateDB() {
@@ -62,7 +71,7 @@ public class DataBasePopulator {
     }
 
     private boolean randomWorked() {
-        return random.nextInt() % 15 == 0 ? true : false;
+        return random.nextInt() % 15 == 0;
     }
 
     private FieldOfStudy randomFieldOfStudy() {

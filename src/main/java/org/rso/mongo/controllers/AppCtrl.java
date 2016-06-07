@@ -21,6 +21,7 @@ public class AppCtrl {
     @Autowired
     private MongoAppService mongoAppService;
 
+
     @RequestMapping(value = "/graduatesByLocation/{location}")
     public ResponseEntity getGraduatesByLocation(@PathVariable Location location){
         log.info("location "+ location);
