@@ -5,8 +5,8 @@ import lombok.extern.java.Log;
 import org.rso.dto.DtoConverters;
 import org.rso.dto.UniversityDto;
 import org.rso.entities.University;
-import org.rso.repositories.UniversityMongoRepository;
 import org.rso.repositories.UniversityRepo;
+import org.rso.repositories.UniversityRepository;
 import org.rso.utils.AppProperty;
 import org.rso.utils.Location;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ import java.util.Optional;
 public class ReplicationController {
 
     @Resource
-    private UniversityMongoRepository universityMongoRepository;
+    private UniversityRepository universityRepository;
 
     @Resource
     private UniversityRepo universityRepo;
@@ -34,7 +34,7 @@ public class ReplicationController {
 
         universityDtoList.stream()
                 .map(DtoConverters.universityDtoToEntity)
-                .forEach(universityMongoRepository::insert);
+                .forEach(universityRepository::insert);
 
         return ResponseEntity.ok().build();
     }

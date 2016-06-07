@@ -2,7 +2,7 @@ package org.rso.services;
 
 import org.rso.dto.*;
 import org.rso.exceptions.LocationDoesNotExistException;
-import org.rso.repositories.UniversityMongoRepository;
+import org.rso.repositories.UniversityRepository;
 import org.rso.utils.ComeFrom;
 import org.rso.utils.Location;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,27 +22,27 @@ import java.util.Map;
 public class MongoAppService {
 
     @Autowired
-    private UniversityMongoRepository universityMongoRepository;
+    private UniversityRepository universityRepository;
 
     public LocationValueDto getGraduatesByLocation(Location location) {
         if(!isLocationExist(location)){
             throw new LocationDoesNotExistException(String.format("location %s does not exist!!! ",location.toString()));
         }
-        return universityMongoRepository.getGraduatesByLocation(location);
+        return universityRepository.getGraduatesByLocation(location);
     }
 
     public List<UniversityDto> getGraduatesByLocationInAllUniwersity(Location location) {
         if(!isLocationExist(location)){
             throw new LocationDoesNotExistException(String.format("location %s does not exist!!! ",location.toString()));
         }
-        return universityMongoRepository.getGraduatesByLocationInAllUniwersity(location);
+        return universityRepository.getGraduatesByLocationInAllUniversities(location);
     }
 
     public List<FieldOfStudyDto> getGraduatesByLocationInAllFieldOfStudy(Location location) {
         if(!isLocationExist(location)){
             throw new LocationDoesNotExistException(String.format("location %s does not exist!!! ",location.toString()));
         }
-        Map<String, Long> fromDob = universityMongoRepository.getGraduatesByLocationInAllFieldOfStudy(location);
+        Map<String, Long> fromDob = universityRepository.getGraduatesByLocationInAllFieldOfStudy(location);
         List<FieldOfStudyDto> fileOfStudyDtos = new ArrayList<>();
         for(String k: fromDob.keySet()){
             long val = fromDob.get(k);
@@ -55,7 +55,7 @@ public class MongoAppService {
         if(!isLocationExist(location)){
             throw new LocationDoesNotExistException(String.format("location %s does not exist!!! ",location.toString()));
         }
-        Map<String ,Long> res = universityMongoRepository.getStatisticOrginGraduateByLocation(location);
+        Map<String ,Long> res = universityRepository.getStatisticOrginGraduateByLocation(location);
         List<ComeFromDto> resList = new ArrayList<>();
         for(String k: res.keySet()){
             long val = res.get(k);
@@ -68,7 +68,7 @@ public class MongoAppService {
         if(!isLocationExist(location)){
             throw new LocationDoesNotExistException(String.format("location %s does not exist!!! ",location.toString()));
         }
-        return universityMongoRepository.getStatisticOrginGaduateByUniversities(location);
+        return universityRepository.getStatisticOrginGaduateByUniversities(location);
 //        return result;
     }
 
@@ -81,21 +81,21 @@ public class MongoAppService {
         if(!isLocationExist(location)){
             throw new LocationDoesNotExistException(String.format("location %s does not exist!!! ",location.toString()));
         }
-        return universityMongoRepository.getStatisticOrginGraduateByFieldOfStudies(location);
+        return universityRepository.getStatisticOrginGraduateByFieldOfStudies(location);
     }
 
     public LocationValueDto getStatisticWorkingStudentsByCountries(Location location) {
         if(!isLocationExist(location)){
             throw new LocationDoesNotExistException(String.format("location %s does not exist!!! ",location.toString()));
         }
-        return universityMongoRepository.getStatisticWorkingStudentsByCountries(location);
+        return universityRepository.getStatisticWorkingStudentsByCountries(location);
     }
 
     public List<UniversityDto> getStatisticWorkingStudentsByUniverities(Location location) {
         if(!isLocationExist(location)){
             throw new LocationDoesNotExistException(String.format("location %s does not exist!!! ",location.toString()));
         }
-        return universityMongoRepository.getStatisticWorkingStudentsByUniverities(location);
+        return universityRepository.getStatisticWorkingStudentsByUniverities(location);
     }
 
 
@@ -103,6 +103,6 @@ public class MongoAppService {
         if(!isLocationExist(location)){
             throw new LocationDoesNotExistException(String.format("location %s does not exist!!! ",location.toString()));
         }
-        return universityMongoRepository.getStatisticWorkingStudentsByFieldOfStudy(location);
+        return universityRepository.getStatisticWorkingStudentsByFieldOfStudy(location);
     }
 }

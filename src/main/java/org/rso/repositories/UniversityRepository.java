@@ -7,32 +7,27 @@ import org.rso.entities.University;
 import org.rso.utils.ComeFrom;
 import org.rso.utils.Location;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-@Repository
-public class UniversityMongoRepository {
+import static java.util.stream.Collectors.toList;
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
+@Repository
+public class UniversityRepository {
 
     @Autowired
     private UniversityRepo universityRepo;
 
+    // a tak w ogole to od kiedy zapisujemy do repo obiekt DTO...? */
     public void insertGraduate(GraduateDto graduateDto) {
-        University university = universityRepo.findByName(graduateDto.getUniversityDto().getName());
-        if (university != null) {
-            Graduate graduate = DtoConverters.graduateDtoToGraduate.apply(graduateDto);
-            university.getGraduates().add(graduate);
-            universityRepo.save(university);
-        } else {
-            University newUniversity = DtoConverters.universityDtoToEntity.apply(graduateDto.getUniversityDto());
-            Graduate graduate = DtoConverters.graduateDtoToGraduate.apply(graduateDto);
-            newUniversity.getGraduates().add(graduate);
-            universityRepo.save(newUniversity);
-        }
+
+        final University university = Optional.ofNullable(universityRepo.findByName(graduateDto.getUniversityDto().getName()))
+                .orElse(DtoConverters.universityDtoToEntity.apply(graduateDto.getUniversityDto()));
+
+        final Graduate graduate = DtoConverters.graduateDtoToEntity.apply(graduateDto);
+        university.getGraduates().add(graduate);
+        universityRepo.save(university);
     }
 
     public University insert(University university) {
@@ -51,21 +46,22 @@ public class UniversityMongoRepository {
         this.universityRepo.deleteAll();
     }
 
-    public LocationValueDto getGraduatesByLocation(Location location) {
-        long res = universityRepo.findByLocation(location).stream()
-                .mapToInt(p -> p.getGraduates().size()).sum();
-//        return null;
-        return new LocationValueDto(location, res);
+    public LocationValueDto getGraduatesByLocation(final Location location) {
+
+        final long res = universityRepo.findByLocation(location).stream()
+                .map(University::getGraduates)
+                .mapToInt(List::size)
+                .sum();
+
+        return new LocationValueDto()
+                .withLocation(location)
+                .withValue(res);
     }
 
-    public List<UniversityDto> getGraduatesByLocationInAllUniwersity(Location location) {
-        List<UniversityDto> result = new ArrayList<>();
-        for (University university : universityRepo.findByLocation(location)) {
-            UniversityDto universityDto = DtoConverters.universityEntityToDto.apply(university);
-            universityDto.setValue(university.getGraduates().size());
-            result.add(universityDto);
-        }
-        return result;
+    public List<UniversityDto> getGraduatesByLocationInAllUniversities(final Location location) {
+        return universityRepo.findByLocation(location).stream()
+                .map(DtoConverters.universityEntityToDto)
+                .collect(toList());
     }
 
     public Map<String, Long> getGraduatesByLocationInAllFieldOfStudy(Location location) {

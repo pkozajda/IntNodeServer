@@ -6,6 +6,8 @@ import org.rso.utils.NodeInfo;
 import org.rso.utils.NodeType;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 public class DtoConverters {
@@ -26,7 +28,7 @@ public class DtoConverters {
                     .locations(nodeStatusDto.getLocations())
                     .build();
 
-    public static Function<GraduateDto,Graduate> graduateDtoToGraduate = graduateDto ->
+    public static Function<GraduateDto, Graduate> graduateDtoToEntity = graduateDto ->
             Graduate.builder()
                     .name(graduateDto.getName())
                     .surname(graduateDto.getSurname())
@@ -50,6 +52,7 @@ public class DtoConverters {
                     .yearOfFundation(entity.getYearOfFundation())
                     .location(entity.getLocation())
                     .universityType(entity.getUniversityType())
+                    .value(Optional.ofNullable(entity.getGraduates()).map(List::size).orElse(0))
                     .build();
 
 }

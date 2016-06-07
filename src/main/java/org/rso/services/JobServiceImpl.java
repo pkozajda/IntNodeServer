@@ -3,8 +3,8 @@ package org.rso.services;
 import lombok.extern.java.Log;
 import org.rso.config.LocationMap;
 import org.rso.dto.*;
-import org.rso.entities.responseObject.LocationMapResponse;
 import org.rso.entities.FieldOfStudy;
+import org.rso.entities.responseObject.LocationMapResponse;
 import org.rso.utils.ComeFrom;
 import org.rso.utils.JobQueue;
 import org.rso.utils.Location;
@@ -51,7 +51,7 @@ public class JobServiceImpl implements JobService {
 
 
     private static final String GRADUATE_BY_LOCATION = "http://{ip}:{port}/int/graduatesByLocation/{location}";
-    private static final String GRADUATE_BY_UNIVERSITIES = "http://{ip}:{port}/int/getGraduatesByLocationInAllUniwersity/{location}";
+    private static final String GRADUATE_BY_UNIVERSITIES = "http://{ip}:{port}/int/getGraduatesByLocationInAllUniversities/{location}";
     private static final String GRADUATE_BY_FIELD_OF_STUDIES = "http://{ip}:{port}/int/getGraduatesByLocationInAllFieldOfStudy/{location}";
     private static final String GRADUATES_BY_ORGIN_BY_COUNTRIES = "http://{ip}:{port}/int/getStatisticOrginGraduateByLocation/countries/{location}";
     private static final String GRADUATES_BY_ORGIN_BY_UNIVERSITIES = "http://{ip}:{port}/int/getStatisticOrginGraduateByLocation/universities/{location}";

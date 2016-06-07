@@ -5,7 +5,7 @@ import org.rso.dto.GraduateDto;
 import org.rso.entities.FieldOfStudy;
 import org.rso.entities.Graduate;
 import org.rso.entities.University;
-import org.rso.repositories.UniversityMongoRepository;
+import org.rso.repositories.UniversityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ public class DataBasePopulator {
     private static final int BASE_POPULATION = 1000;
 
     @Autowired
-    private UniversityMongoRepository universityRepository;
+    private UniversityRepository universityRepository;
 
     @Value("${populate.on_startup}")
     private boolean populateOnStartup;
