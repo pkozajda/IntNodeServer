@@ -1,6 +1,10 @@
-package org.rso.entities;
+package org.rso.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.rso.entities.FieldOfStudy;
 import org.rso.utils.ComeFrom;
 import org.rso.utils.Location;
 
@@ -8,12 +12,11 @@ import org.rso.utils.Location;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
-@Builder
-public class Graduate {
+public class GraduateDto {
     private String name;
     private String surname;
     private ComeFrom comeFrom;
     private Location locationFrom;
-    private boolean workedAtStudy;
     private FieldOfStudy fieldOfStudy;
+    private UniversityDto universityDto;
 }

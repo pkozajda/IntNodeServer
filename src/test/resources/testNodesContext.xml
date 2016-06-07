@@ -11,7 +11,7 @@
         </property>
     </bean>
 
-    <bean id="nodesCfgService" class="org.rso.service.NodesCfgServiceImpl" init-method="afterPropertiesSet">
+    <bean id="nodesCfgService" class="org.rso.configuration.services.NodesCfgServiceImpl" init-method="afterPropertiesSet">
         <property name="properties" ref="propertyFactoryBean" />
         <property name="propertyKey" value="nodes" />
     </bean>

@@ -2,7 +2,7 @@ package org.rso.tasks;
 
 import lombok.extern.java.Log;
 import org.rso.dto.JobEntityDto;
-import org.rso.service.JobService;
+import org.rso.services.JobService;
 import org.rso.utils.AppProperty;
 import org.rso.utils.JobQueue;
 import org.rso.utils.JobType;

@@ -1,20 +1,20 @@
 package org.rso.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.rso.utils.Location;
 
+import java.util.ArrayList;
 import java.util.List;
 
+
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class NodeStatusDto {
-    private int nodeId;
-    private String nodeIPAddress;
-    private String nodeType;
-    private List<Location> locations;
+@EqualsAndHashCode
+public class LocationComeFromDto {
+    private Location location;
+    private List<ComeFromDto> comeFromDtos = new ArrayList<>();
 }

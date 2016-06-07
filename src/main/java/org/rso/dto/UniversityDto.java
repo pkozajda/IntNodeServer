@@ -5,10 +5,6 @@ import lombok.*;
 import org.rso.utils.Location;
 import org.rso.utils.UniversityType;
 
-
-/**
- * Created by Radosław on 20.05.2016.
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,7 +13,7 @@ import org.rso.utils.UniversityType;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UniversityDto {
     private String name;
-    private String yerOfFundation;
+    private String yearOfFundation;
     private Location location;
     private UniversityType universityType;
     private int value;

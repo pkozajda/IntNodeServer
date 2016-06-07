@@ -1,15 +1,16 @@
-package org.rso.entities;
+package org.rso.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
+import org.rso.utils.ComeFrom;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @EqualsAndHashCode
-public class FieldOfStudy {
-    private String name;
+public class ComeFromDto {
+    private ComeFrom comeFrom;
+    private long val;
 }

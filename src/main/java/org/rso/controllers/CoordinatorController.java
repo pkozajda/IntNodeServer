@@ -1,12 +1,16 @@
 package org.rso.controllers;
 
+import javaslang.control.Try;
 import lombok.extern.java.Log;
+import org.rso.configuration.LocationMap;
 import org.rso.dto.DtoConverters;
 import org.rso.dto.NodeStatusDto;
 import org.rso.exceptions.NodeNotFoundException;
-import org.rso.service.NodeUtilService;
+import org.rso.services.NodeUtilService;
+import org.rso.services.ReplicationService;
 import org.rso.utils.AppProperty;
 import org.rso.utils.NodeInfo;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +31,15 @@ public class CoordinatorController {
 
     @Resource(name = "internalNodeUtilService")
     private NodeUtilService nodeUtilService;
+
+    @Resource
+    private ReplicationService replicationService;
+
+    @Resource
+    private LocationMap locationMap;
+
+    @Value("${replication.redundancy}")
+    private int replicationReduntancy;
 
     private final AppProperty appProperty = AppProperty.getInstance();
 
@@ -59,13 +72,35 @@ public class CoordinatorController {
                 .nodeType(allocatedNodeInfo.getNodeType())
                 .build();
 
-        // add entry into appProperty
+        // addEntry entry into appProperty
 
         appProperty.addAvaiableNode(createdNodeInfo);
 
         // TODO: inform other nodes about network update
 
         // TODO: do not block for network updates (this can take a looong time)
+
+
+
+        // perform replication on a new node
+        replicationService.getTopLocations(replicationReduntancy)
+                .forEach(location ->
+                    Try.run(() -> replicationService.replicateLocation(location, createdNodeInfo))
+                            .onSuccess(e -> {
+                                log.info(
+                                        String.format("Successfully replicated data about location: %s on node: %d [%s]",
+                                                location, createdNodeInfo.getNodeId(), createdNodeInfo.getNodeIPAddress())
+                                );
+
+                                locationMap.addEntry(location, createdNodeInfo);
+                            })
+                );
+
+        createdNodeInfo.setLocations(locationMap.getLocationsForNode(createdNodeInfo));
+
+        // remmemeber to remove transfered locations from database info
+
+        //TODO: remove location from selected nodes...
 
         return ResponseEntity.created(ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")

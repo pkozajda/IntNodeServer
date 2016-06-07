@@ -1,7 +1,7 @@
 package org.rso.controllers;
 
 import lombok.extern.java.Log;
-import org.rso.service.AppServiceImpl;
+import org.rso.services.AppServiceImpl;
 import org.rso.utils.AppProperty;
 import org.rso.utils.NodeInfo;
 import org.springframework.beans.factory.annotation.Autowired;
