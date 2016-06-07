@@ -102,7 +102,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public void getGraduatesFromAllUniversities(JobEntityDto jobEntityDto) {
         List<UniversityDto> result = new ArrayList<>();
-        getFromUniversityDto(result,GRADUATES_BY_ORGIN_BY_COUNTRIES);
+        getFromUniversityDto(result,GRADUATE_BY_UNIVERSITIES);
         sendResponse(jobEntityDto, result);
     }
 
