@@ -72,7 +72,7 @@ public class CoordinatorController {
                 .nodeType(allocatedNodeInfo.getNodeType())
                 .build();
 
-        // add entry into appProperty
+        // addEntry entry into appProperty
 
         appProperty.addAvaiableNode(createdNodeInfo);
 
@@ -92,11 +92,13 @@ public class CoordinatorController {
                                                 location, createdNodeInfo.getNodeId(), createdNodeInfo.getNodeIPAddress())
                                 );
 
-                                locationMap.add(location, createdNodeInfo);
+                                locationMap.addEntry(location, createdNodeInfo);
                             })
                 );
 
         createdNodeInfo.setLocations(locationMap.getLocationsForNode(createdNodeInfo));
+
+        // remmemeber to remove transfered locations from database info
 
         //TODO: remove location from selected nodes...
 

@@ -70,7 +70,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public void registerJob(JobEntityDto jobEntityDto) {
-        log.info("add to queue " + jobEntityDto);
+        log.info("addEntry to queue " + jobEntityDto);
         jobQueue.add(jobEntityDto);
     }
 

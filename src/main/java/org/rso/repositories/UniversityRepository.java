@@ -1,5 +1,6 @@
 package org.rso.repositories;
 
+import lombok.NonNull;
 import org.rso.dto.*;
 import org.rso.entities.FieldOfStudy;
 import org.rso.entities.Graduate;
@@ -119,8 +120,9 @@ public class UniversityRepository {
         return new LocationValueDto(location,val);
     }
 
-    public List<UniversityDto> getStatisticWorkingStudentsByUniverities(Location location) {
+    public List<UniversityDto> getStatisticWorkingStudentsByUniverities(@NonNull final Location location) {
         List<UniversityDto> result = new ArrayList<>();
+
         for(University university: universityRepo.findByLocation(location)){
             long val = university.getGraduates().stream().filter(Graduate::isWorkedAtStudy).count();
             UniversityDto universityDto = DtoConverters.universityEntityToDto.apply(university);

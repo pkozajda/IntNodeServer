@@ -33,7 +33,6 @@ public class DataBasePopulator {
     private static final Predicate<Location> locationPredicate = location -> location != Location.LAND;
 
 
-
     @PostConstruct
     public void init() {
         universityRepository.clear();

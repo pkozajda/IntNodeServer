@@ -30,9 +30,9 @@ public class MapLocationTest {
         NodeInfo nodeInfo = new NodeInfo(1,"123.33.33.22", NodeType.INTERNAL, Arrays.asList(Location.MAZOWIECKIE, Location.DOLNOSLASKIE));
         NodeInfo nodeInfo1 = new NodeInfo(2,"123.33.33.22", NodeType.INTERNAL_COORDINATOR, Arrays.asList(Location.DOLNOSLASKIE));
 
-        locationMap.add(Location.MAZOWIECKIE,nodeInfo);
-        locationMap.add(Location.DOLNOSLASKIE,nodeInfo);
-        locationMap.add(Location.DOLNOSLASKIE,nodeInfo1);
+        locationMap.addEntry(Location.MAZOWIECKIE,nodeInfo);
+        locationMap.addEntry(Location.DOLNOSLASKIE,nodeInfo);
+        locationMap.addEntry(Location.DOLNOSLASKIE,nodeInfo1);
 
         assertEquals(2, locationMap.getNodesByLocation(Location.DOLNOSLASKIE).size());
 

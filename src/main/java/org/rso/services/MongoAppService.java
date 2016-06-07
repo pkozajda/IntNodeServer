@@ -2,7 +2,6 @@ package org.rso.services;
 
 import org.rso.dto.*;
 import org.rso.exceptions.LocationDoesNotExistException;
-import org.rso.repositories.UniversityRepository;
 import org.rso.utils.ComeFrom;
 import org.rso.utils.Location;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Radosław on 28.05.2016.
- */
 @Service
 @Transactional
 public class MongoAppService {

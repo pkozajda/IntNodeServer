@@ -7,10 +7,7 @@ import org.rso.utils.AppProperty;
 import org.rso.utils.Location;
 import org.rso.utils.NodeInfo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 
@@ -19,26 +16,26 @@ public class LocationMap {
 
     private final AppProperty appProperty = AppProperty.getInstance();
 
-    private Map<Location,List<NodeInfo>> locationMap = new HashMap<>();
+    private final Map<Location, List<NodeInfo>> locationMap = new HashMap<>();
 
-    public void add(Location location, NodeInfo nodeInfo){
+    public void addEntry(final Location location, final NodeInfo nodeInfo) {
+
+        // TODO: Duplicates
         if(locationMap.containsKey(location)){
-            List<NodeInfo> nodeInfos = locationMap.get(location);
+            locationMap.get(location).add(nodeInfo);
+        } else {
+            final List<NodeInfo> nodeInfos = new ArrayList<>();
             nodeInfos.add(nodeInfo);
-//            locationMap.get(location).add(nodeInfo);
-        }
-        else {
-            List<NodeInfo> nodeInfos = new ArrayList<>();
-            nodeInfos.add(nodeInfo);
-            locationMap.put(location,nodeInfos);
+            locationMap.put(location, nodeInfos);
         }
     }
 
-    public List<NodeInfo> getNodesByLocation(Location location){
-        return locationMap.get(location);
+    public List<NodeInfo> getNodesByLocation(final Location location){
+        return Optional.ofNullable(locationMap.get(location))
+                .orElse(Collections.emptyList());
     }
 
-    public void removeNodeInfo(NodeInfo nodeInfo){
+    public void removeNodeInfo(final NodeInfo nodeInfo) {
         for (Location location: locationMap.keySet()){
             List<NodeInfo> nodeInfos = locationMap.get(location);
             nodeInfos.remove(nodeInfo);

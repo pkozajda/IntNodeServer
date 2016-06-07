@@ -24,7 +24,7 @@ public class AppConfig {
     public LocationMap locationMap(){
         LocationMap locationMap = new LocationMap();
         for(Location location: Location.values()){
-            locationMap.add(location,appProperty.getSelfNode());
+            locationMap.addEntry(location,appProperty.getSelfNode());
         }
         return locationMap;
     }

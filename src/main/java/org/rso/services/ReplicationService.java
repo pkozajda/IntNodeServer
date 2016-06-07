@@ -53,9 +53,19 @@ public class ReplicationService {
         ((SimpleClientHttpRequestFactory)restTemplate.getRequestFactory()).setConnectTimeout(connectionTimeout);
     }
 
+    // remember to remove assigned nodes from list
     public List<Location> getTopLocations(final int top) {
+
+        final int locationEntriesNumber = locationMap.getLocationMap().size();
+
+        if(top < 1 || top > locationMap.getLocationMap().size()) {
+            throw new RuntimeException(
+                    String.format("Cannot retrieve %d top locations from location map of %d entries", top, locationEntriesNumber)
+            );
+        }
+
         return locationMap.getLocationMap().entrySet().stream()
-                .sorted((es1, es2) -> Integer.compare(es1.getValue().size(), es2.getValue().size()))
+                .sorted((es1, es2) -> -Integer.compare(es1.getValue().size(), es2.getValue().size()))
                 .limit(top)
                 .map(Map.Entry::getKey)
                 .collect(toList());
@@ -72,7 +82,7 @@ public class ReplicationService {
                 ).stream().map(DtoConverters.universityEntityToDto).collect(Collectors.toList());
 
 
-        final ResponseEntity<Void> replicationResponseEntity = restTemplate.postForEntity(
+        final ResponseEntity<Void> replicationResponseEntity = restTemplate.postForEntity (
                 REPLICATION_URL,
                 universitiesForLocationDto,
                 Void.class,
