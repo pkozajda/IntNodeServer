@@ -7,7 +7,6 @@ import org.rso.entities.Graduate;
 import org.rso.entities.University;
 import org.rso.repositories.UniversityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -25,8 +24,7 @@ public class DataBasePopulator {
     @Autowired
     private UniversityRepository universityRepository;
 
-    @Value("${populate.on_startup}")
-    private boolean populateOnStartup;
+    private final AppProperty appProperty = AppProperty.getInstance();
 
     private final Random random = new Random();
 
@@ -37,7 +35,7 @@ public class DataBasePopulator {
     public void init() {
         universityRepository.clear();
 
-        if(populateOnStartup) {
+        if(appProperty.isSelfNodeCoordinator()) {
             populateDB();
         }
     }
