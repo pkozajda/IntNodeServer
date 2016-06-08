@@ -134,6 +134,7 @@ public class DataBasePopulator {
                 new University("Uniwersytet Wroclawski", "1820", Location.DOLNOSLASKIE, UniversityType.UNIVERSITY),
                 new University("Politechnika Rzeszowska", "1820", Location.PODKARPADZKIE, UniversityType.POLYTECHNIC),
                 new University("Uniwersytet Ekonomiczny w Krakowie", "1820", Location.MALOPOLSKIE, UniversityType.UNIVERSITY)
+                new University("Uniwersytet Ekonomiczny w Krakowie", "1820", Location.MALOPOLSKIE, UniversityType.UNIVERSITY)
         );
     }
 }
